@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/fa/!svn/ver/585/falcon/branches/R2.0.0/soapclient/WebContent/WEB-INF/lib
+END
+commons-cli-1.2.jar
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/fa/!svn/ver/519/falcon/branches/R2.0.0/soapclient/WebContent/WEB-INF/lib/commons-cli-1.2.jar
+END
+jaxrpc.jar
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/fa/!svn/ver/519/falcon/branches/R2.0.0/soapclient/WebContent/WEB-INF/lib/jaxrpc.jar
+END
+activation.jar
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/fa/!svn/ver/585/falcon/branches/R2.0.0/soapclient/WebContent/WEB-INF/lib/activation.jar
+END
+mail.jar
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/fa/!svn/ver/585/falcon/branches/R2.0.0/soapclient/WebContent/WEB-INF/lib/mail.jar
+END
+wsdl4j.jar
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/fa/!svn/ver/519/falcon/branches/R2.0.0/soapclient/WebContent/WEB-INF/lib/wsdl4j.jar
+END
+commons-logging.jar
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/fa/!svn/ver/519/falcon/branches/R2.0.0/soapclient/WebContent/WEB-INF/lib/commons-logging.jar
+END
+axis.jar
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/fa/!svn/ver/519/falcon/branches/R2.0.0/soapclient/WebContent/WEB-INF/lib/axis.jar
+END
+commons-discovery-0.2.jar
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/fa/!svn/ver/519/falcon/branches/R2.0.0/soapclient/WebContent/WEB-INF/lib/commons-discovery-0.2.jar
+END

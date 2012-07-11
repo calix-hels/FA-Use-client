@@ -1,0 +1,57 @@
+
+This folder contains the reference implementation (in Java) and executable jar file (GetUse.jar) that is used to extract usage information from the Flow Analyzer using the 'Usage Based Billing' API.
+
+GetUse.jar is currently returning information to the standard out stream in CSV format.  If the user provides FTP information, then the CSV file will be pushed to that location.
+
+The GetUse.jar executable jar has no UI interface and is launched from the command line.  It also requires Java 1.4 or later to be installed on the system.
+
+# java -jar GetUse.jar --help
+usage: GetUse
+ -fa,--target <target>            flow analyzer host name
+ -uname,--username <username>     the username of the soap service
+ -psw,--password <password>       the password of the soap service
+ -et,--entityType <entityType>    entity type: 
+                                  'endpoint', 'application' or 'location'
+ -n,--name <endpoint>             the name of the endpoint
+                                  optional
+ -d,--dimension <dimension>       dimension of the data
+                                  'endpoint', 'application'
+                                  optional
+ -s,--starttime <time>            get information from this UTC time.
+                                  format: 2000-12-31 or "2000-12-31
+                                  12:00:00"
+ -e,--endtime <time>              get information to this UTC time.
+                                  format: 2000-12-31 or "2000-12-31
+                                  12:00:00"
+                                  optional
+ -i,--interval <period>           must be 'daily','hourly' or 'monthly'
+ -ei,--entityId <entityId>        entity id
+                                  optional
+ -f,--ftpfile <ftpfile>           ftp file name
+                                  optional
+ -p,--ftppassword <ftppassword>   ftp password
+                                  optional
+ -t,--ftphost <ftphost>           host or IP of the ftp server
+                                  optional
+ -u,--ftpuser <ftpuser>           ftp username
+                                  optional
+ -h,--help                        display this message
+
+
+
+Examples
+
+All request start with 
+$ java -jar GetUse.jar -fa <fa_host_name> -uname <user> -psw <password> 
+
+Basic request, getting all endpoints for June 1-2 for the day
+... -et endpoint -s 2012-06-01 -e 2012-06-02 -i daily
+
+Basic request, but limit request to 'endpoint1'
+... -et endpoint -s 2012-6-1 -e 2012-6-2 -i daily -n endpoint1
+Date,Endpoint,Total Down,Total Up,Avg Rate Down,Avg Rate Up
+01/01/2012 00:00:00,endpoint1,4.8146781951008177E8,2.3734259201335163E9,5662.0,29470.0
+01/02/2012 00:00:00,endpoint1,5.109532936646637E8,2.376581361652924E9,5984.0,30146.0
+
+Basic request, getting all endpoints for June 1-2 for the day, but break down the result by application
+... -et endpoint -s 2012-06-01 -e 2012-06-02 -i daily -d application

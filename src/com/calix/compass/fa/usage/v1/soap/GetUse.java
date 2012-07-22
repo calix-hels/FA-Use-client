@@ -114,8 +114,8 @@ public class GetUse {
 						ftpHost, ftpUser, ftpPass, ftpFile);
 		}
 	 } catch (Exception e) {
-			System.err.println("Failed to execute.  Reason: " + e);
-			System.exit(2);
+		System.err.println("Failed to execute.  Reason: " + e);
+		System.exit(2);
 	 }
 	}
     
@@ -126,9 +126,9 @@ public class GetUse {
 		}
 
     	if (!isHeaderPrinted){
-			String header = "StartTime|" + entityType.toUpperCase() + "|Total Down|Total Up|Avg Rate Down|Avg Rate Up|Max Rate Down|Max Rate Up";
+			String header = "StartTime," + entityType.toUpperCase() + ",Total Down,Total Up,Avg Rate Down,Avg Rate Up,Max Rate Down,Max Rate Up";
 			if(!StringUtils.isEmpty(dimension)){
-				header += "|" + dimension;
+				header += "," + dimension;
 			}
 			System.out.println(header);
 			isHeaderPrinted = true;
@@ -136,16 +136,16 @@ public class GetUse {
     	for (int i = 0; i < iPDRs.length; i++) {
 			IPDRX ipdrx = (IPDRX) iPDRs[i];
 			StringBuffer result = new StringBuffer();
-			result.append(csvFriendlyDateFormatGmt.format(ipdrx.getStartTime().getTime()) + "|")
-			      .append(ipdrx.getSubscriberID() + "|")
-			      .append(ipdrx.getInputOctets() + "|")
-			      .append(ipdrx.getOutputOctets() + "|")
-                  .append(ipdrx.getAvgInputRate() + "|")
-				  .append(ipdrx.getAvgOutputRate() + "|")
-				  .append(ipdrx.getMaxInputRate() + "|")
+			result.append(csvFriendlyDateFormatGmt.format(ipdrx.getStartTime().getTime()) + ",")
+			      .append(ipdrx.getSubscriberID() + ",")
+			      .append(ipdrx.getInputOctets() + ",")
+			      .append(ipdrx.getOutputOctets() + ",")
+                  .append(ipdrx.getAvgInputRate() + ",")
+				  .append(ipdrx.getAvgOutputRate() + ",")
+				  .append(ipdrx.getMaxInputRate() + ",")
 				  .append(ipdrx.getMaxOutputRate());
 		    if(!StringUtils.isEmpty(dimension)){
-		    	result.append("|" + ipdrx.getToDim() );
+		    	result.append("," + ipdrx.getToDim() );
 		    }
 			System.out.println(result);
 		}

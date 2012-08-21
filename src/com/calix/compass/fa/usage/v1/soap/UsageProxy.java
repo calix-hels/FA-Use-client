@@ -1,5 +1,7 @@
 package com.calix.compass.fa.usage.v1.soap;
 
+import java.util.Date;
+
 public class UsageProxy implements com.calix.compass.fa.usage.v1.soap.Usage {
   private String _endpoint = null;
   private com.calix.compass.fa.usage.v1.soap.Usage usage = null;
@@ -44,7 +46,7 @@ public class UsageProxy implements com.calix.compass.fa.usage.v1.soap.Usage {
     return usage;
   }
   
-  public com.calix.compass.fa.usage.v1.soap.data.IPDRX[] getUse(java.lang.String entityType, java.lang.String entityId, java.util.Calendar startTime, java.util.Calendar endTime, java.lang.String interval, java.lang.String dimension) throws java.rmi.RemoteException{
+  public com.calix.compass.fa.usage.v1.soap.data.IPDRX[] getUse(java.lang.String entityType, java.lang.String entityId, Date startTime, Date endTime, java.lang.String interval, java.lang.String dimension) throws java.rmi.RemoteException{
     if (usage == null)
       _initUsageProxy();
     return usage.getUse(entityType, entityId, startTime, endTime, interval, dimension);
@@ -56,7 +58,7 @@ public class UsageProxy implements com.calix.compass.fa.usage.v1.soap.Usage {
     return usage.getIPDR(endpoint, startTime, endTime, interval);
   }
   
-  public void ftpUse(java.lang.String entityType, java.lang.String entityId, java.util.Calendar startTime, java.util.Calendar endTime, java.lang.String interval, java.lang.String dimension, java.lang.String hostname, java.lang.String username, java.lang.String password, java.lang.String filename) throws java.rmi.RemoteException{
+  public void ftpUse(java.lang.String entityType, java.lang.String entityId, Date startTime, Date endTime, java.lang.String interval, java.lang.String dimension, java.lang.String hostname, java.lang.String username, java.lang.String password, java.lang.String filename) throws java.rmi.RemoteException{
     if (usage == null)
       _initUsageProxy();
     usage.ftpUse(entityType, entityId, startTime, endTime, interval, dimension, hostname, username, password, filename);

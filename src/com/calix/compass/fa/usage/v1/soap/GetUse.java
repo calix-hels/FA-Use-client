@@ -4,8 +4,8 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.SimpleTimeZone;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.axis.utils.StringUtils;
 import org.apache.commons.cli.CommandLine;
@@ -21,26 +21,27 @@ import com.calix.compass.fa.usage.v1.soap.data.IPDRX;
 public class GetUse {
 	private static final SimpleDateFormat dateFormatGmt = new SimpleDateFormat("yyyy-MM-dd");
 	private static final SimpleDateFormat dateTimeFormatGmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	private static final SimpleDateFormat completeDateFormatGmt = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
 	static SimpleDateFormat csvFriendlyDateFormatGmt = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-	static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	static SimpleDateFormat simpleDateFosormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private static final int ONE_HOUR_IN_MILLISECONDS = 1 * 3600 * 1000;
-	private static final int MONTHLY_REQUEST_INTERVAL = 2;
+	private static final int ONE_DAY_IN_MILLISECONDS = ONE_HOUR_IN_MILLISECONDS * 24;
+	private static final int DAILY_REQUEST_INTERVAL = 10;
 	private static final int HOURLY_REQUEST_INTERVAL = 24;
 	static final Calendar NOW_CAL = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-	private static int rawTimeZoneOffset = 0;
 	static boolean isHeaderPrinted = false;
 	
 	static {
-	    TimeZone def = SimpleTimeZone.getDefault();
-	    rawTimeZoneOffset = def.getRawOffset();
 	    csvFriendlyDateFormatGmt.setTimeZone(TimeZone.getTimeZone("GMT"));
+	    dateTimeFormatGmt.setTimeZone(TimeZone.getTimeZone("GMT"));
+	    dateFormatGmt.setTimeZone(TimeZone.getTimeZone("GMT"));
 	}
 	
 	private static String target = "localhost";
     private static String endpoint;
     private static Calendar startCal;
     private static Calendar endCal;
+    private static Date startTime;
+    private static Date endTime;
     private static String interval;
     private static String ftpHost;
     private static String ftpUser;
@@ -61,23 +62,23 @@ public class GetUse {
 		UsageServiceLocator locator = new UsageServiceLocator();
 		Usage usage = locator.getUsage(new URL("https://" + target + "/soap/services/Usage"));
 		InstallCert.generateCert(target, 443, "changeit");
+		
 		try {
 			if (ftpHost == null) {
 				//TODO: Break the request in smaller chunks.
 				IPDR[] iPDRs = null;
-        		while (endCal != null && startCal.getTime().compareTo(endCal.getTime()) <= 0){
+        		while (endTime != null && startTime.compareTo(endTime) <= 0){
         			if ("daily".equalsIgnoreCase(interval)) {
 	                    //2-day chunk as we did in R2.0.
-		        		if (endCal.get(Calendar.DAY_OF_MONTH) - startCal.get(Calendar.DAY_OF_MONTH) > MONTHLY_REQUEST_INTERVAL){
-	                    	Calendar tmpstartCal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-	                    	tmpstartCal.setTimeInMillis(startCal.getTimeInMillis());
-						    Calendar tmpendCal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-						    startCal.add(Calendar.DAY_OF_MONTH, MONTHLY_REQUEST_INTERVAL);
-						    tmpendCal.setTimeInMillis(startCal.getTimeInMillis());
-							iPDRs = usage.getUse(entityType, entityId, tmpstartCal, tmpendCal, interval, dimension);
+		        		if (timeInterval(startTime, endTime) > DAILY_REQUEST_INTERVAL){
+						    Date tempStartTime = new Date(startTime.getTime());
+						    startTime.setTime(startTime.getTime() + DAILY_REQUEST_INTERVAL  * ONE_DAY_IN_MILLISECONDS);
+						    Date tempEndTime = new Date(startTime.getTime());
+						    startTime.setTime(startTime.getTime() + ONE_DAY_IN_MILLISECONDS);
+							iPDRs = usage.getUse(entityType, entityId, tempStartTime, tempEndTime, interval, dimension);
 	                        printResult(iPDRs);
 		        		} else {
-		        			iPDRs = usage.getUse(entityType, entityId, startCal, endCal, interval, dimension);
+		        			iPDRs = usage.getUse(entityType, entityId, startTime, endTime, interval, dimension);
 		        			printResult(iPDRs);
 		                    if (iPDRs == null){
 		                    	 System.out.println("Completed");
@@ -85,17 +86,16 @@ public class GetUse {
 		        			return;
 		        		}	
         			} else if ("hourly".equalsIgnoreCase(interval)){
-	        			long hourOffset = (endCal.getTimeInMillis() - startCal.getTimeInMillis()) / ONE_HOUR_IN_MILLISECONDS;
+	        			long hourOffset = (endTime.getTime() - startTime.getTime()) / ONE_HOUR_IN_MILLISECONDS;
 	        			if ( hourOffset > HOURLY_REQUEST_INTERVAL ){
-	                    	Calendar tmpstartCal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-	                    	tmpstartCal.setTimeInMillis(startCal.getTimeInMillis());
-						    Calendar tmpendCal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-						    startCal.setTimeInMillis(startCal.getTimeInMillis() + HOURLY_REQUEST_INTERVAL * ONE_HOUR_IN_MILLISECONDS);
-						    tmpendCal.setTimeInMillis(startCal.getTimeInMillis());
-							iPDRs = usage.getUse(entityType, entityId, tmpstartCal, tmpendCal, interval, dimension);
+	        				
+	        				Date tempStartTime = new Date(startTime.getTime());
+	        				startTime.setTime(startTime.getTime() + HOURLY_REQUEST_INTERVAL * ONE_HOUR_IN_MILLISECONDS );
+	        				Date tempEndTime = new Date(startTime.getTime());
+							iPDRs = usage.getUse(entityType, entityId, tempStartTime, tempEndTime, interval, dimension);
 	                        printResult(iPDRs);
 	        			} else {
-		        			iPDRs = usage.getUse(entityType, entityId, startCal, endCal, interval, dimension);
+		        			iPDRs = usage.getUse(entityType, entityId, startTime, endTime, interval, dimension);
 		        			printResult(iPDRs);
 		                    if (iPDRs == null){
 		                    	 System.out.println("Completed");
@@ -103,14 +103,13 @@ public class GetUse {
 		        			return;
 	        			}
         			}
-
 		     } 
  	         //for monthly interval, we don't have to break the request so far.
-      		 iPDRs = usage.getUse(entityType, entityId, startCal, endCal, interval, dimension);
+      		 iPDRs = usage.getUse(entityType, entityId, startTime, endTime, interval, dimension);
  	         printResult(iPDRs);
 
 		}else {
-				usage.ftpUse(entityType, entityId, startCal, endCal, interval, dimension, 
+				usage.ftpUse(entityType, entityId, startTime, endTime, interval, dimension, 
 						ftpHost, ftpUser, ftpPass, ftpFile);
 		}
 	 } catch (Exception e) {
@@ -118,6 +117,10 @@ public class GetUse {
 		System.exit(2);
 	 }
 	}
+    
+    private static int timeInterval(Date startTime, Date endTime){
+    	return (int)TimeUnit.MILLISECONDS.toDays(endTime.getTime() - startTime.getTime());
+    }
     
     private static void printResult(IPDR[] iPDRs){
 		// Process the response
@@ -183,11 +186,12 @@ public class GetUse {
 	        		throw new Exception("interval can only be 'daily' or 'monthly' or 'hourly'.");
 	        	}
 		        if (line.hasOption("starttime")) {
-					Date startTime;
+					
 					String value = (String)line.getOptionValue("starttime");
 					try {
 						if("hourly".equalsIgnoreCase(interval)){
 							startTime = dateTimeFormatGmt.parse(value);
+							
 						}else{
 							startTime = dateFormatGmt.parse(value);
 						}
@@ -195,15 +199,9 @@ public class GetUse {
 					} catch (Exception e) {
 						throw new Exception("starttime format incorrect: " + value);
 					}
-					startCal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-					startCal.setTimeInMillis(startTime.getTime() + rawTimeZoneOffset);
-					if (startCal.getTime().compareTo(NOW_CAL.getTime()) > 0){
-						NOW_CAL.setTimeInMillis(NOW_CAL.getTimeInMillis() + rawTimeZoneOffset);
-						startCal = NOW_CAL;
-					}
 		        }
 		        if (line.hasOption("endtime")) {
-					Date endTime;
+					
 					String value = line.getOptionValue("endtime");
 					try {
 						if("hourly".equalsIgnoreCase(interval)){
@@ -215,13 +213,6 @@ public class GetUse {
 					} catch (Exception e) {
 						throw new Exception("endtime format incorrect: " + value);
 					}
-
-					endCal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-					endCal.setTimeInMillis(endTime.getTime() + rawTimeZoneOffset);
-					if (endCal.getTime().compareTo(startCal.getTime()) < 0){
-						endCal = startCal;
-					}
-					
 		        }
 	        }
 	        if (line.hasOption("ftphost")) {
@@ -282,7 +273,7 @@ public class GetUse {
 		Options options = new Options();
 		options.addOption(OptionBuilder.withArgName("target")
 				.hasArg()
-				.withDescription("flow analyzer host name")
+				.withDescription("flow analyze host name")
 				.withLongOpt("target")
 				.create("fa"));
 		options.addOption(OptionBuilder.withArgName("username")

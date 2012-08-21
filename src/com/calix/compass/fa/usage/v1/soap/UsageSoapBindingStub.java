@@ -7,6 +7,8 @@
 
 package com.calix.compass.fa.usage.v1.soap;
 
+import java.util.Date;
+
 public class UsageSoapBindingStub extends org.apache.axis.client.Stub implements com.calix.compass.fa.usage.v1.soap.Usage {
     private java.util.Vector cachedSerClasses = new java.util.Vector();
     private java.util.Vector cachedSerQNames = new java.util.Vector();
@@ -220,7 +222,7 @@ public class UsageSoapBindingStub extends org.apache.axis.client.Stub implements
         }
     }
 
-    public com.calix.compass.fa.usage.v1.soap.data.IPDRX[] getUse(java.lang.String entityType, java.lang.String entityId, java.util.Calendar startTime, java.util.Calendar endTime, java.lang.String interval, java.lang.String dimension) throws java.rmi.RemoteException {
+    public com.calix.compass.fa.usage.v1.soap.data.IPDRX[] getUse(java.lang.String entityType, java.lang.String entityId, Date startTime, Date endTime, java.lang.String interval, java.lang.String dimension) throws java.rmi.RemoteException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -288,7 +290,7 @@ public class UsageSoapBindingStub extends org.apache.axis.client.Stub implements
 }
     }
 
-    public void ftpUse(java.lang.String entityType, java.lang.String entityId, java.util.Calendar startTime, java.util.Calendar endTime, java.lang.String interval, java.lang.String dimension, java.lang.String hostname, java.lang.String username, java.lang.String password, java.lang.String filename) throws java.rmi.RemoteException {
+    public void ftpUse(java.lang.String entityType, java.lang.String entityId, Date startTime, Date endTime, java.lang.String interval, java.lang.String dimension, java.lang.String hostname, java.lang.String username, java.lang.String password, java.lang.String filename) throws java.rmi.RemoteException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }

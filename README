@@ -1,7 +1,43 @@
-Example Output
-StartTime,ENDPOINT,Total Down,Total Up,Avg Rate Down,Avg Rate Up,Max Rate Down,Max Rate Up,application
-05/31/2012 00:00:00,subA,4.4795716E7,6431953.0,3303.5176,474.33267,7749.6162,1725.5504,Google_Web
-05/31/2012 00:00:00,subA,2047926.1,118894.01,2844.342,165.13057,2844.342,271.37738,Level3Comm
-05/31/2012 00:00:00,subA,2506912.5,1286635.9,5222.7344,2680.4915,8161.8022,2680.4915,Microsoft_Web
-05/31/2012 00:00:00,subA,7383410.0,638709.69,976.64154,84.485405,1722.9902,84.485405,Unmapped Ports
-05/31/2012 00:00:00,subA,75268.82,10138.249,627.24017,84.485405,627.24017,84.485405,VMware_vMotion
+This folder contains the reference implementation (in Java) and executable jar file (GetUse.jar) that is used to extract usage information from the Flow Analyzer using the 'Usage Based Billing' SOAP API.API documentation is available in the accompanying document, Calix Database API and Schema.pdf.  GetUse.jar documentation is available below.GetUse.jar is executed from the command line, with a description of its input parameters below.  It returns information to the standard out stream in CSV format.  If the user provides FTP information, then the CSV file will be pushed to that location.
+
+# java -jar GetUse.jar --help
+usage: GetUse 
+   -fa,--target <target>            flow analyzer host name 
+   -uname,--username <username>     the username of the soap service 
+   -psw,--password <password>       the password of the soap service 
+   -et,--entityType <entityType>    entity type:                                   
+                                    'endpoint', 'application' or 'location' 
+   -ei,--entityId <entityId>        entity id                                  
+                                    optional 
+   -d,--dimension <dimension>       dimension of the data                                  
+                                    'endpoint', 'application'                                  
+									optional 
+   -s,--starttime <time>            get information from this UTC time.                                  
+                                    format: 2000-12-31 or "2000-12-31 12:00:00" 
+   -e,--endtime <time>              get information to this UTC time.                                
+                                    format: 2000-12-31 or "2000-12-31 12:00:00"                                  
+									optional 
+   -i,--interval <period>           must be 'daily','hourly' or 'monthly' 
+   -f,--ftpfile <ftpfile>           ftp file name                                  
+                                    optional 
+   -p,--ftppassword <ftppassword>   ftp password                                  
+                                    optional 
+   -t,--ftphost <ftphost>           host or IP of the ftp server                                  
+                                    optional 
+   -u,--ftpuser <ftpuser>           ftp username                                  
+                                    optional 
+   -n,--name <endpoint>             the name of the endpoint                                  
+                                    optional 
+   -aggr,--aggregate <aggregate>    aggregate subscriber's hourly|daily|monthly data
+   -h,--help                        display this message
+   
+   Examples
+   All request start with $ java -jar GetUse.jar -fa <fa_host_name> -uname <user> -psw <password> 
+   #1) Basic request, getting all endpoints for June 1-2 for the day
+       ... -et endpoint -s 2012-06-01 -e 2012-06-02 -i daily
+   #2) The same #1, but only retrieve usage information for 'endpoint1'
+       ... -et endpoint -s 2012-6-1 -e 2012-6-2 -i daily -ei endpoint1
+   #3) The same as #1, but break down the result by application
+       ... -et endpoint -s 2012-06-01 -e 2012-06-02 -i daily -d application 
+   #4) The same as #1, but aggregate the result with regard to subscribers
+       ... -et endpoint -s 2012-06-01 -e 2012-06-02 -i daily -d application -aggr

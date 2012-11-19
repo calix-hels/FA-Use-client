@@ -109,7 +109,7 @@ public class GetUse {
 	private static void processHourlyReport(Usage usage, List iPDRsList)
 			throws RemoteException {
 		IPDR[] iPDRs = null;
-		while (endTime != null && startTime.compareTo(endTime) <= 0){
+		while (endTime != null && startTime.compareTo(endTime) < 0){
 			long hourOffset = (endTime.getTime() - startTime.getTime()) / ONE_HOUR_IN_MILLISECONDS;
 			if ( hourOffset > HOURLY_REQUEST_INTERVAL ){
 				
@@ -126,8 +126,9 @@ public class GetUse {
 			    }else {
 				    printResult(iPDRsList);
 			    }
+				startTime.setTime(startTime.getTime() + HOURLY_REQUEST_INTERVAL * ONE_HOUR_IN_MILLISECONDS );
 			}
-			break;
+//			break;
 		  }
 	}
 

@@ -1,9 +1,16 @@
 package com.calix.compass.fa.usage.v1.soap;
 
 import java.net.URL;
+import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
@@ -17,6 +24,7 @@ import org.apache.commons.cli.Options;
 
 import com.calix.compass.fa.usage.v1.soap.data.IPDR;
 import com.calix.compass.fa.usage.v1.soap.data.IPDRX;
+import com.calix.compass.fa.usage.v1.soap.data.IpdrComparator;
 
 public class GetUse {
 	private static final SimpleDateFormat dateFormatGmt = new SimpleDateFormat("yyyy-MM-dd");
@@ -25,7 +33,7 @@ public class GetUse {
 	static SimpleDateFormat simpleDateFosormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private static final int ONE_HOUR_IN_MILLISECONDS = 1 * 3600 * 1000;
 	private static final int ONE_DAY_IN_MILLISECONDS = ONE_HOUR_IN_MILLISECONDS * 24;
-	private static final int DAILY_REQUEST_INTERVAL = 10;
+	private static final int DAILY_REQUEST_INTERVAL = 2;
 	private static final int HOURLY_REQUEST_INTERVAL = 24;
 	static final Calendar NOW_CAL = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
 	static boolean isHeaderPrinted = false;
@@ -50,7 +58,9 @@ public class GetUse {
     private static String entityType;
     private static String entityId;
     private static String dimension;
-
+    private static String aggregate;
+    private static boolean isAggr = false;
+    
     public static void main(String[] args) throws Exception {
     	/**  
     	 * After generating client soap stubs, change
@@ -58,7 +68,6 @@ public class GetUse {
     	 *  - UsageSoapBindingStub._call.setTimeout(new Integer(1000*60*60*3)) and remove enclosing brackets
     	 */
     	parseOptions(args);
-	    
 		UsageServiceLocator locator = new UsageServiceLocator();
 		Usage usage = locator.getUsage(new URL("https://" + target + "/soap/services/Usage"));
 		InstallCert.generateCert(target, 443, "changeit");
@@ -66,48 +75,16 @@ public class GetUse {
 		try {
 			if (ftpHost == null) {
 				//TODO: Break the request in smaller chunks.
-				IPDR[] iPDRs = null;
-        		while (endTime != null && startTime.compareTo(endTime) <= 0){
-        			if ("daily".equalsIgnoreCase(interval)) {
-	                    //2-day chunk as we did in R2.0.
-		        		if (timeInterval(startTime, endTime) > DAILY_REQUEST_INTERVAL){
-						    Date tempStartTime = new Date(startTime.getTime());
-						    startTime.setTime(startTime.getTime() + DAILY_REQUEST_INTERVAL  * ONE_DAY_IN_MILLISECONDS);
-						    Date tempEndTime = new Date(startTime.getTime());
-						    startTime.setTime(startTime.getTime() + ONE_DAY_IN_MILLISECONDS);
-							iPDRs = usage.getUse(entityType, entityId, tempStartTime, tempEndTime, interval, dimension);
-	                        printResult(iPDRs);
-		        		} else {
-		        			iPDRs = usage.getUse(entityType, entityId, startTime, endTime, interval, dimension);
-		        			printResult(iPDRs);
-		                    if (iPDRs == null){
-		                    	 System.out.println("Completed");
-		                    }
-		        			return;
-		        		}	
-        			} else if ("hourly".equalsIgnoreCase(interval)){
-	        			long hourOffset = (endTime.getTime() - startTime.getTime()) / ONE_HOUR_IN_MILLISECONDS;
-	        			if ( hourOffset > HOURLY_REQUEST_INTERVAL ){
-	        				
-	        				Date tempStartTime = new Date(startTime.getTime());
-	        				startTime.setTime(startTime.getTime() + HOURLY_REQUEST_INTERVAL * ONE_HOUR_IN_MILLISECONDS );
-	        				Date tempEndTime = new Date(startTime.getTime());
-							iPDRs = usage.getUse(entityType, entityId, tempStartTime, tempEndTime, interval, dimension);
-	                        printResult(iPDRs);
-	        			} else {
-		        			iPDRs = usage.getUse(entityType, entityId, startTime, endTime, interval, dimension);
-		        			printResult(iPDRs);
-		                    if (iPDRs == null){
-		                    	 System.out.println("Completed");
-		                    }
-		        			return;
-	        			}
-        			}
-		     } 
- 	         //for monthly interval, we don't have to break the request so far.
-      		 iPDRs = usage.getUse(entityType, entityId, startTime, endTime, interval, dimension);
- 	         printResult(iPDRs);
-
+		        List iPDRsList = new ArrayList();
+				
+        	    if ("daily".equalsIgnoreCase(interval)) {
+        			  processDailyReport(usage, iPDRsList);
+        		} else if ("hourly".equalsIgnoreCase(interval)){
+	        		  processHourlyReport(usage, iPDRsList);
+        		} else {
+        			 processMonthlyReport(usage, iPDRsList);
+        		}
+             System.out.println("Completed");
 		}else {
 				usage.ftpUse(entityType, entityId, startTime, endTime, interval, dimension, 
 						ftpHost, ftpUser, ftpPass, ftpFile);
@@ -117,6 +94,75 @@ public class GetUse {
 		System.exit(2);
 	 }
 	}
+
+	private static void processMonthlyReport(Usage usage, List iPDRsList)
+			throws RemoteException {
+		 IPDR[] iPDRs = usage.getUse(entityType, entityId, startTime, endTime, interval, dimension);
+		 addToList(iPDRsList, iPDRs);
+		 if (isAggr) {
+			 printAggregateResult(iPDRsList); 
+		 } else {
+		     printResult(iPDRs);	 
+		 }
+	}
+
+	private static void processHourlyReport(Usage usage, List iPDRsList)
+			throws RemoteException {
+		IPDR[] iPDRs = null;
+		while (endTime != null && startTime.compareTo(endTime) < 0){
+			long hourOffset = (endTime.getTime() - startTime.getTime()) / ONE_HOUR_IN_MILLISECONDS;
+			if ( hourOffset > HOURLY_REQUEST_INTERVAL ){
+				
+				Date tempStartTime = new Date(startTime.getTime());
+				startTime.setTime(startTime.getTime() + HOURLY_REQUEST_INTERVAL * ONE_HOUR_IN_MILLISECONDS );
+				Date tempEndTime = new Date(startTime.getTime());
+				iPDRs = usage.getUse(entityType, entityId, tempStartTime, tempEndTime, interval, dimension);
+				addToList(iPDRsList, iPDRs);
+			} else {
+				iPDRs = usage.getUse(entityType, entityId, startTime, endTime, interval, dimension);
+				addToList(iPDRsList, iPDRs);
+			    if (isAggr){
+			    	printAggregateResult(iPDRsList);
+			    }else {
+				    printResult(iPDRsList);
+			    }
+				startTime.setTime(startTime.getTime() + HOURLY_REQUEST_INTERVAL * ONE_HOUR_IN_MILLISECONDS );
+			}
+//			break;
+		  }
+	}
+
+	private static void processDailyReport(Usage usage, List iPDRsList)
+			throws RemoteException {
+		IPDR[] iPDRs = null;
+		while (endTime != null && startTime.compareTo(endTime) <= 0){
+		    //2-day chunk as we did in R2.0.
+			if (timeInterval(startTime, endTime) > DAILY_REQUEST_INTERVAL){
+			    Date tempStartTime = new Date(startTime.getTime());
+			    startTime.setTime(startTime.getTime() + DAILY_REQUEST_INTERVAL  * ONE_DAY_IN_MILLISECONDS);
+			    Date tempEndTime = new Date(startTime.getTime());
+			    startTime.setTime(startTime.getTime() + ONE_DAY_IN_MILLISECONDS);
+				iPDRs = usage.getUse(entityType, entityId, tempStartTime, tempEndTime, interval, dimension);
+				addToList(iPDRsList, iPDRs);
+			} else {
+				iPDRs = usage.getUse(entityType, entityId, startTime, endTime, interval, dimension);
+				addToList(iPDRsList, iPDRs);
+			    if (isAggr){
+			    	printAggregateResult(iPDRsList);
+			    }else {
+			    	Collections.sort(iPDRsList, new IpdrComparator());
+			    	printResult(iPDRsList);
+			    }
+				break;
+			}
+		  }
+	}
+
+	private static void addToList(List iPDRsList, IPDR[] iPDRs) {
+		if (null != iPDRs){
+			Collections.addAll(iPDRsList, iPDRs);
+		}
+	}
     
     private static int timeInterval(Date startTime, Date endTime){
     	return (int)TimeUnit.MILLISECONDS.toDays(endTime.getTime() - startTime.getTime());
@@ -124,35 +170,138 @@ public class GetUse {
     
     private static void printResult(IPDR[] iPDRs){
 		// Process the response
+	    if(null != iPDRs ){
+	      	if (!isHeaderPrinted){
+	  			String header = "StartTime," + entityType.toUpperCase() + ",Total Down,Total Up,Avg Rate Down,Avg Rate Up,Max Rate Down,Max Rate Up";
+	  			if(!StringUtils.isEmpty(dimension)){
+	  				header += "," + dimension;
+	  			}
+	  			System.out.println(header);
+	  			isHeaderPrinted = true;
+	      	}
+	      	for (int i = 0; i < iPDRs.length; i++) {
+	  			IPDRX ipdrx = (IPDRX) iPDRs[i];
+	  			StringBuffer result = new StringBuffer();
+	  			result.append(csvFriendlyDateFormatGmt.format(ipdrx.getStartTime().getTime()) + ",")
+	  			      .append(ipdrx.getSubscriberID() + ",")
+	  			      .append(ipdrx.getInputOctets() + ",")
+	  			      .append(ipdrx.getOutputOctets() + ",")
+	                    .append(ipdrx.getAvgInputRate() + ",")
+	  				  .append(ipdrx.getAvgOutputRate() + ",")
+	  				  .append(ipdrx.getMaxInputRate() + ",")
+	  				  .append(ipdrx.getMaxOutputRate());
+	  		    if(!StringUtils.isEmpty(dimension)){
+	  		    	result.append("," + ipdrx.getToDim() );
+	  		    }
+	  			System.out.println(result);
+	  		}  
+	     }
+    }
+    
+    
+    private static void printResult(List iPDRs){
+		// Process the response
+
+      if(iPDRs.size() > 0){
+      	if (!isHeaderPrinted){
+  			String header = "StartTime," + entityType.toUpperCase() + ",Total Down,Total Up,Avg Rate Down,Avg Rate Up,Max Rate Down,Max Rate Up";
+  			if(!StringUtils.isEmpty(dimension)){
+  				header += "," + dimension;
+  			}
+  			System.out.println(header);
+  			isHeaderPrinted = true;
+      	}
+      	for (int i = 0; i < iPDRs.size(); i++) {
+  			IPDRX ipdrx = (IPDRX) iPDRs.get(i);
+  			StringBuffer result = new StringBuffer();
+  			result.append(csvFriendlyDateFormatGmt.format(ipdrx.getStartTime().getTime()) + ",")
+  			      .append(ipdrx.getSubscriberID() + ",")
+  			      .append(ipdrx.getInputOctets() + ",")
+  			      .append(ipdrx.getOutputOctets() + ",")
+                    .append(ipdrx.getAvgInputRate() + ",")
+  				  .append(ipdrx.getAvgOutputRate() + ",")
+  				  .append(ipdrx.getMaxInputRate() + ",")
+  				  .append(ipdrx.getMaxOutputRate());
+  		    if(!StringUtils.isEmpty(dimension)){
+  		    	result.append("," + ipdrx.getToDim() );
+  		    }
+  			System.out.println(result);
+  		} 
+      }
+    }
+    
+    private static int subscriberCount(String subscriberId, List iPDRs){
+    	int result = 0;
+    	for (int i=0; i < iPDRs.size(); ++i){
+    		IPDRX ipdrx = (IPDRX)iPDRs.get(i);
+    	    if (subscriberId.equalsIgnoreCase(ipdrx.getSubscriberID())){
+    	    	++result;
+    	    }
+    	}
+    	return result;
+    }
+    
+    private static void printAggregateResult(List iPDRs){
+		// Process the response
 		if (iPDRs == null) {
 			return;
 		}
 
-    	if (!isHeaderPrinted){
-			String header = "StartTime," + entityType.toUpperCase() + ",Total Down,Total Up,Avg Rate Down,Avg Rate Up,Max Rate Down,Max Rate Up";
-			if(!StringUtils.isEmpty(dimension)){
-				header += "," + dimension;
-			}
-			System.out.println(header);
-			isHeaderPrinted = true;
-    	}
-    	for (int i = 0; i < iPDRs.length; i++) {
-			IPDRX ipdrx = (IPDRX) iPDRs[i];
-			StringBuffer result = new StringBuffer();
-			result.append(csvFriendlyDateFormatGmt.format(ipdrx.getStartTime().getTime()) + ",")
-			      .append(ipdrx.getSubscriberID() + ",")
-			      .append(ipdrx.getInputOctets() + ",")
-			      .append(ipdrx.getOutputOctets() + ",")
-                  .append(ipdrx.getAvgInputRate() + ",")
-				  .append(ipdrx.getAvgOutputRate() + ",")
-				  .append(ipdrx.getMaxInputRate() + ",")
-				  .append(ipdrx.getMaxOutputRate());
-		    if(!StringUtils.isEmpty(dimension)){
-		    	result.append("," + ipdrx.getToDim() );
-		    }
-			System.out.println(result);
+		String header = entityType.toUpperCase() + ",Total Down,Total Up,Avg Rate Down,Avg Rate Up,Max Rate Down,Max Rate Up";
+		if(!StringUtils.isEmpty(dimension)){
+			header += "," + dimension;
 		}
-    }
+		System.out.println(header);
+    	/*TODO: loop through the iPDRs array and aggregate the result based on different subscribers.
+    	 * 
+    	 * */
+
+    	Map subscriberDataMap = new HashMap();
+    	Map subscriberDataCountMap = new HashMap();
+    	SubscriberData subscriberData = null;
+    	
+    	for (int i = 0; i < iPDRs.size(); i++) {
+			IPDRX ipdrx = (IPDRX) iPDRs.get(i);
+			subscriberData = new SubscriberData(ipdrx.getSubscriberID(), ipdrx.getStartTime().getTime(), ipdrx.getInputOctets(), 
+					                            ipdrx.getOutputOctets(), ipdrx.getMaxInputRate(), ipdrx.getMaxOutputRate(), ipdrx.getToDim());
+            if (null == subscriberDataMap.get(ipdrx.getSubscriberID())){
+            	subscriberDataMap.put(ipdrx.getSubscriberID(),subscriberData);
+            	subscriberDataCountMap.put(ipdrx.getSubscriberID(), new Integer(subscriberCount(ipdrx.getSubscriberID(), iPDRs)));
+            }else{
+            	SubscriberData existingSubscriberData = (SubscriberData)subscriberDataMap.get(ipdrx.getSubscriberID());
+            	existingSubscriberData.setInputOctets(existingSubscriberData.getInputOctets() + ipdrx.getInputOctets());
+            	existingSubscriberData.setOutputOctets(existingSubscriberData.getOutputOctets() + ipdrx.getOutputOctets());
+                if(ipdrx.getMaxInputRate() > existingSubscriberData.getMaxInputRate()){
+                	existingSubscriberData.setMaxInputRate(ipdrx.getMaxInputRate());
+                }
+                if(ipdrx.getMaxOutputRate() > existingSubscriberData.getMaxOutputRate()){
+                    existingSubscriberData.setMaxOutputRate(ipdrx.getMaxOutputRate());	
+                }
+            }
+    	    
+    	}    
+	    
+        Iterator iter = subscriberDataMap.entrySet().iterator();
+        while (iter.hasNext()){
+        	Map.Entry entry = (Map.Entry) iter.next();
+        	SubscriberData data = (SubscriberData)entry.getValue();
+        	StringBuffer result = new StringBuffer();
+        	result.append(data.getSubscriberId() + ",")
+        	      .append(data.getInputOctets() + "," )
+        	      .append(data.getOutputOctets() + ",");
+        	Integer subscriberDataCount = (Integer)subscriberDataCountMap.get(data.getSubscriberId());
+        	double avgInputRate = data.getInputOctets() / subscriberDataCount.intValue();
+        	double avgOutputRate = data.getOutputOctets() / subscriberDataCount.intValue();
+        	result.append(avgInputRate + ",")
+        	      .append(avgOutputRate + ",")
+        	      .append(data.getMaxInputRate() + ",")
+        	      .append(data.getMaxOutputRate());
+		    if(!StringUtils.isEmpty(dimension)){
+		    	result.append("," + data.getDimension());
+		    }
+		    System.out.println(result);
+        } 
+	}
 
 	protected static void parseOptions(String[] args) {
 		Options options = getOptions();
@@ -246,6 +395,10 @@ public class GetUse {
 	        	dimension = line.getOptionValue("dimension");
 	        }
 	        
+	        if (line.hasOption("aggregate")){
+	        	isAggr = true;
+	        }
+	        
 	    } catch( Exception exp ) {
 	    	System.err.println("Failed to start.  Reason: " + exp.getMessage());
 	    	HelpFormatter formatter = new HelpFormatter();
@@ -265,6 +418,7 @@ public class GetUse {
 				System.out.println("entityType: " + entityType);
 				System.out.println("entityId: " + entityId);
 				System.out.println("dimension: " + dimension);
+				System.out.println("aggregate: " + aggregate);
 			}
 	    }
 	}
@@ -345,6 +499,10 @@ public class GetUse {
 				.withDescription("dimension of the data")
 				.withLongOpt("dimension")
 				.create("d"));
+		options.addOption(OptionBuilder.withArgName("aggregate")
+				.withDescription("aggregate subscriber's hourly|daily|monthly data")
+				.withLongOpt("aggregate")
+				.create("aggr"));
 		options.addOption(OptionBuilder
 				.withDescription("display this message")
 				.withLongOpt("help")

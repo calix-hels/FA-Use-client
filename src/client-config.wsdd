@@ -9,8 +9,8 @@
 		    </handler>
 			<handler name="TimeOutHandler"
 				type="java:com.calix.compass.fa.usage.v1.soap.TimeOutHandler">
-				<!-- Added a 30 minute time out. 30 * 60000(1min) -->
-				<parameter name="timeout" value="1800000" />
+				<!-- Added a 2 hour time out. 120 * 60000(1min) -->
+				<parameter name="timeout" value="7200000" />
 			</handler>
 		</requestFlow>
 		<parameter name="disablePrettyXML" value="true" />

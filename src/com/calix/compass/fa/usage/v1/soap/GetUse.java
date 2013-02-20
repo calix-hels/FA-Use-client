@@ -22,7 +22,6 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 
-import com.calix.compass.fa.usage.v1.soap.data.IPDR;
 import com.calix.compass.fa.usage.v1.soap.data.IPDRX;
 import com.calix.compass.fa.usage.v1.soap.data.IpdrComparator;
 
@@ -97,7 +96,7 @@ public class GetUse {
 
 	private static void processMonthlyReport(Usage usage, List iPDRsList)
 			throws RemoteException {
-		 IPDR[] iPDRs = usage.getUse(entityType, entityId, startTime, endTime, interval, dimension);
+		 IPDRX[] iPDRs = usage.getUse(entityType, entityId, startTime, endTime, interval, dimension);
 		 addToList(iPDRsList, iPDRs);
 		 if (isAggr) {
 			 printAggregateResult(iPDRsList); 
@@ -108,11 +107,10 @@ public class GetUse {
 
 	private static void processHourlyReport(Usage usage, List iPDRsList)
 			throws RemoteException {
-		IPDR[] iPDRs = null;
-		while (endTime != null && startTime.compareTo(endTime) < 0){
+		IPDRX[] iPDRs = null;
+		while (endTime != null && startTime.compareTo(endTime) <= 0){
 			long hourOffset = (endTime.getTime() - startTime.getTime()) / ONE_HOUR_IN_MILLISECONDS;
 			if ( hourOffset > HOURLY_REQUEST_INTERVAL ){
-				
 				Date tempStartTime = new Date(startTime.getTime());
 				startTime.setTime(startTime.getTime() + HOURLY_REQUEST_INTERVAL * ONE_HOUR_IN_MILLISECONDS );
 				Date tempEndTime = new Date(startTime.getTime());
@@ -126,15 +124,14 @@ public class GetUse {
 			    }else {
 				    printResult(iPDRsList);
 			    }
-				startTime.setTime(startTime.getTime() + HOURLY_REQUEST_INTERVAL * ONE_HOUR_IN_MILLISECONDS );
+			    break;
 			}
-//			break;
 		  }
 	}
 
 	private static void processDailyReport(Usage usage, List iPDRsList)
 			throws RemoteException {
-		IPDR[] iPDRs = null;
+		IPDRX[] iPDRs = null;
 		while (endTime != null && startTime.compareTo(endTime) <= 0){
 		    //2-day chunk as we did in R2.0.
 			if (timeInterval(startTime, endTime) > DAILY_REQUEST_INTERVAL){
@@ -158,7 +155,7 @@ public class GetUse {
 		  }
 	}
 
-	private static void addToList(List iPDRsList, IPDR[] iPDRs) {
+	private static void addToList(List iPDRsList, IPDRX[] iPDRs) {
 		if (null != iPDRs){
 			Collections.addAll(iPDRsList, iPDRs);
 		}
@@ -168,7 +165,7 @@ public class GetUse {
     	return (int)TimeUnit.MILLISECONDS.toDays(endTime.getTime() - startTime.getTime());
     }
     
-    private static void printResult(IPDR[] iPDRs){
+    private static void printResult(IPDRX[] iPDRs){
 		// Process the response
 	    if(null != iPDRs ){
 	      	if (!isHeaderPrinted){

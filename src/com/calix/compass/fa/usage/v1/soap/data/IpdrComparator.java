@@ -5,16 +5,20 @@ import java.util.Comparator;
 public class IpdrComparator implements Comparator {
 
 	public int compare(Object ipdr1, Object ipdr2) {
+		int result = 0;
 		if(ipdr1.equals(ipdr2)){
 			return 0 ;
-	    }else if(compareStartTime((IPDR)ipdr1, (IPDR)ipdr2)){
-		    return 1 ;
-	    }else{
-			return -1 ;
 	    }
+		result = ((IPDRX)ipdr1).getSubscriberID().compareTo(((IPDRX)ipdr2).getSubscriberID());
+		if (result == 0) {
+			result = compareStartTime((IPDRX)ipdr1, (IPDRX)ipdr2);
+		}
+		
+		return result;
     }
 
-    private boolean compareStartTime(IPDR ipdr1, IPDR ipdr2){
-        return ipdr1.getStartTime().after(ipdr2.getStartTime());
+    private int compareStartTime(IPDRX ipdr1, IPDRX ipdr2){
+        return ipdr1.getStartTime().after(ipdr2.getStartTime()) ? 1 : 0;
     }
+    
 }

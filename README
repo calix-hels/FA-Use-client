@@ -1,35 +1,32 @@
 This folder contains the reference implementation (in Java) and executable jar file (GetUse.jar) that is used to extract usage information from the Flow Analyze using the 'Usage Based Billing' SOAP API.API documentation is available in the accompanying document, Calix Database API and Schema.pdf.  GetUse.jar documentation is available below.GetUse.jar is executed from the command line, with a description of its input parameters below.  It returns information to the standard out stream in CSV format.  If the user provides FTP information, then the CSV file will be pushed to that location.
 
 # java -jar GetUse.jar --help
-usage: GetUse 
-   -fa,--target <target>            flow analyze host name 
-   -uname,--username <username>     the username of the soap service 
-   -psw,--password <password>       the password of the soap service 
-   -et,--entityType <entityType>    entity type:                                   
-                                    'endpoint', 'application' or 'location' 
-   -ei,--entityId <entityId>        entity id                                  
-                                    optional 
-   -d,--dimension <dimension>       dimension of the data                                  
-                                    'endpoint', 'application'                                  
-									optional 
-   -s,--starttime <time>            get information from this UTC time.                                  
-                                    format: 2000-12-31 or "2000-12-31 12:00:00" 
-   -e,--endtime <time>              get information to this UTC time.                                
-                                    format: 2000-12-31 or "2000-12-31 12:00:00"                                  
-									optional 
-   -i,--interval <period>           must be 'daily','hourly' or 'monthly' 
-   -f,--ftpfile <ftpfile>           ftp file name                                  
-                                    optional 
-   -p,--ftppassword <ftppassword>   ftp password                                  
-                                    optional 
-   -t,--ftphost <ftphost>           host or IP of the ftp server                                  
-                                    optional 
-   -u,--ftpuser <ftpuser>           ftp username                                  
-                                    optional 
-   -n,--name <endpoint>             the name of the endpoint                                  
-                                    optional 
-   -aggr,--aggregate <aggregate>    aggregate subscriber's hourly|daily|monthly data
-   -h,--help                        display this message
+usage: GetUse
+ -aggr,--aggregate                aggregate subscriber's
+                                  hourly|daily|monthly data
+ -d,--dimension <dimension>       dimension of the data
+ -e,--endtime <time>              get information to this UTC time.
+                                  format: 2000-12-31 or "2000-12-31
+                                  12:00:00"
+ -ei,--entityId <entityId>        entity id
+ -et,--entityType <entityType>    entity type
+ -f,--ftpfile <ftpfile>           ftp file name
+ -fa,--target <target>            flow analyze host name
+ -h,--help                        display this message
+ -i,--interval <period>           must be 'daily'or 'hourly' or 'monthly'
+                                  or 'raw'
+ -map,--mappingdetail             show the mapping method of the endpoints
+ -n,--name <endpoint>             the name of the endpoint
+ -p,--ftppassword <ftppassword>   ftp password
+ -psw,--password <password>       the password of the soap service
+ -s,--starttime <time>            get information from this UTC time.
+                                  format: 2000-12-31 or "2000-12-31
+                                  12:00:00"
+ -t,--ftphost <ftphost>           host or IP of the ftp server
+ -u,--ftpuser <ftpuser>           ftp username
+ -uname,--username <username>     the username of the soap service
+
+   
    
    Examples
    All request start with $ java -jar GetUse.jar -fa <fa_host_name> -uname <user> -psw <password> 

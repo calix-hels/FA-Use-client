@@ -10,11 +10,12 @@ public class SubscriberData {
 	private double outputOctets;
 	private double maxInputRate;
 	private double maxOutputRate;
-	private String dimension;
+	private String dimension = "";
+	private String mappingType = "";
 
 	public SubscriberData(String subscriberId, Date startTime,
 			double inputOctets, double outputOctets, double maxInputRate,
-			double maxOutputRate, String dimension) {
+			double maxOutputRate, String dimension, String mappingType) {
 		this.subscriberId = subscriberId;
 		this.startTime = startTime;
 		this.inputOctets = inputOctets;
@@ -22,6 +23,7 @@ public class SubscriberData {
 		this.maxInputRate = maxInputRate;
 		this.maxOutputRate = maxOutputRate;
 		this.dimension = dimension;
+		this.mappingType = mappingType;
 	}
 
 	public String getSubscriberId() {
@@ -80,6 +82,14 @@ public class SubscriberData {
 
 	public void setDimension(String dimension) {
 		this.dimension = dimension;
+	}
+
+	public String getMappingType() {
+		return mappingType;
+	}
+
+	public void setMappingType(String mappingType) {
+		this.mappingType = mappingType;
 	}
 	
 

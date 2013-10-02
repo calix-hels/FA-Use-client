@@ -7,8 +7,6 @@
 
 package com.calix.compass.fa.usage.v1.soap;
 
-import java.util.Date;
-
 public class UsageSoapBindingStub extends org.apache.axis.client.Stub implements com.calix.compass.fa.usage.v1.soap.Usage {
     private java.util.Vector cachedSerClasses = new java.util.Vector();
     private java.util.Vector cachedSerQNames = new java.util.Vector();
@@ -26,44 +24,6 @@ public class UsageSoapBindingStub extends org.apache.axis.client.Stub implements
         org.apache.axis.description.OperationDesc oper;
         org.apache.axis.description.ParameterDesc param;
         oper = new org.apache.axis.description.OperationDesc();
-        oper.setName("getUse");
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://soap.v1.usage.fa.compass.calix.com", "entityType"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
-        oper.addParameter(param);
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://soap.v1.usage.fa.compass.calix.com", "entityId"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
-        oper.addParameter(param);
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://soap.v1.usage.fa.compass.calix.com", "startTime"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "dateTime"), java.util.Calendar.class, false, false);
-        oper.addParameter(param);
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://soap.v1.usage.fa.compass.calix.com", "endTime"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "dateTime"), java.util.Calendar.class, false, false);
-        oper.addParameter(param);
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://soap.v1.usage.fa.compass.calix.com", "interval"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
-        oper.addParameter(param);
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://soap.v1.usage.fa.compass.calix.com", "dimension"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
-        oper.addParameter(param);
-        oper.setReturnType(new javax.xml.namespace.QName("http://data.soap.v1.usage.fa.compass.calix.com", "IPDRX"));
-        oper.setReturnClass(com.calix.compass.fa.usage.v1.soap.data.IPDRX[].class);
-        oper.setReturnQName(new javax.xml.namespace.QName("http://soap.v1.usage.fa.compass.calix.com", "getUseReturn"));
-        oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
-        oper.setUse(org.apache.axis.constants.Use.LITERAL);
-        _operations[0] = oper;
-
-        oper = new org.apache.axis.description.OperationDesc();
-        oper.setName("getIPDR");
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://soap.v1.usage.fa.compass.calix.com", "endpoint"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
-        oper.addParameter(param);
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://soap.v1.usage.fa.compass.calix.com", "startTime"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "dateTime"), java.util.Calendar.class, false, false);
-        oper.addParameter(param);
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://soap.v1.usage.fa.compass.calix.com", "endTime"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "dateTime"), java.util.Calendar.class, false, false);
-        oper.addParameter(param);
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://soap.v1.usage.fa.compass.calix.com", "interval"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
-        oper.addParameter(param);
-        oper.setReturnType(new javax.xml.namespace.QName("http://data.soap.v1.usage.fa.compass.calix.com", "IPDR"));
-        oper.setReturnClass(com.calix.compass.fa.usage.v1.soap.data.IPDR[].class);
-        oper.setReturnQName(new javax.xml.namespace.QName("http://soap.v1.usage.fa.compass.calix.com", "getIPDRReturn"));
-        oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
-        oper.setUse(org.apache.axis.constants.Use.LITERAL);
-        _operations[1] = oper;
-
-        oper = new org.apache.axis.description.OperationDesc();
         oper.setName("ftpUse");
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://soap.v1.usage.fa.compass.calix.com", "entityType"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
         oper.addParameter(param);
@@ -77,6 +37,8 @@ public class UsageSoapBindingStub extends org.apache.axis.client.Stub implements
         oper.addParameter(param);
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://soap.v1.usage.fa.compass.calix.com", "dimension"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
         oper.addParameter(param);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://soap.v1.usage.fa.compass.calix.com", "mappingDetail"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"), boolean.class, false, false);
+        oper.addParameter(param);
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://soap.v1.usage.fa.compass.calix.com", "hostname"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
         oper.addParameter(param);
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://soap.v1.usage.fa.compass.calix.com", "username"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
@@ -88,7 +50,7 @@ public class UsageSoapBindingStub extends org.apache.axis.client.Stub implements
         oper.setReturnType(org.apache.axis.encoding.XMLType.AXIS_VOID);
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
-        _operations[2] = oper;
+        _operations[0] = oper;
 
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("ftpIPDR");
@@ -109,6 +71,46 @@ public class UsageSoapBindingStub extends org.apache.axis.client.Stub implements
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://soap.v1.usage.fa.compass.calix.com", "filename"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
         oper.addParameter(param);
         oper.setReturnType(org.apache.axis.encoding.XMLType.AXIS_VOID);
+        oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
+        oper.setUse(org.apache.axis.constants.Use.LITERAL);
+        _operations[1] = oper;
+
+        oper = new org.apache.axis.description.OperationDesc();
+        oper.setName("getIPDR");
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://soap.v1.usage.fa.compass.calix.com", "endpoint"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
+        oper.addParameter(param);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://soap.v1.usage.fa.compass.calix.com", "startTime"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "dateTime"), java.util.Calendar.class, false, false);
+        oper.addParameter(param);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://soap.v1.usage.fa.compass.calix.com", "endTime"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "dateTime"), java.util.Calendar.class, false, false);
+        oper.addParameter(param);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://soap.v1.usage.fa.compass.calix.com", "interval"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
+        oper.addParameter(param);
+        oper.setReturnType(new javax.xml.namespace.QName("http://data.soap.v1.usage.fa.compass.calix.com", "IPDR"));
+        oper.setReturnClass(com.calix.compass.fa.usage.v1.soap.data.IPDR[].class);
+        oper.setReturnQName(new javax.xml.namespace.QName("http://soap.v1.usage.fa.compass.calix.com", "getIPDRReturn"));
+        oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
+        oper.setUse(org.apache.axis.constants.Use.LITERAL);
+        _operations[2] = oper;
+
+        oper = new org.apache.axis.description.OperationDesc();
+        oper.setName("getUse");
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://soap.v1.usage.fa.compass.calix.com", "entityType"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
+        oper.addParameter(param);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://soap.v1.usage.fa.compass.calix.com", "entityId"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
+        oper.addParameter(param);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://soap.v1.usage.fa.compass.calix.com", "startTime"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "dateTime"), java.util.Calendar.class, false, false);
+        oper.addParameter(param);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://soap.v1.usage.fa.compass.calix.com", "endTime"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "dateTime"), java.util.Calendar.class, false, false);
+        oper.addParameter(param);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://soap.v1.usage.fa.compass.calix.com", "interval"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
+        oper.addParameter(param);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://soap.v1.usage.fa.compass.calix.com", "dimension"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
+        oper.addParameter(param);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://soap.v1.usage.fa.compass.calix.com", "mappingDetail"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"), boolean.class, false, false);
+        oper.addParameter(param);
+        oper.setReturnType(new javax.xml.namespace.QName("http://data.soap.v1.usage.fa.compass.calix.com", "IPDRX"));
+        oper.setReturnClass(com.calix.compass.fa.usage.v1.soap.data.IPDRX[].class);
+        oper.setReturnQName(new javax.xml.namespace.QName("http://soap.v1.usage.fa.compass.calix.com", "getUseReturn"));
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
         _operations[3] = oper;
@@ -175,7 +177,9 @@ public class UsageSoapBindingStub extends org.apache.axis.client.Stub implements
             if (super.cachedEndpoint != null) {
                 _call.setTargetEndpointAddress(super.cachedEndpoint);
             }
-            _call.setTimeout(new Integer(1000*60*60*3));
+            if (super.cachedTimeout != null) {
+                _call.setTimeout(super.cachedTimeout);
+            }
             if (super.cachedPortName != null) {
                 _call.setPortName(super.cachedPortName);
             }
@@ -222,7 +226,7 @@ public class UsageSoapBindingStub extends org.apache.axis.client.Stub implements
         }
     }
 
-    public com.calix.compass.fa.usage.v1.soap.data.IPDRX[] getUse(java.lang.String entityType, java.lang.String entityId, Date startTime, Date endTime, java.lang.String interval, java.lang.String dimension) throws java.rmi.RemoteException {
+    public void ftpUse(java.lang.String entityType, java.lang.String entityId, java.util.Date startTime, java.util.Date endTime, java.lang.String interval, java.lang.String dimension, boolean mappingDetail, java.lang.String hostname, java.lang.String username, java.lang.String password, java.lang.String filename) throws java.rmi.RemoteException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -234,23 +238,43 @@ public class UsageSoapBindingStub extends org.apache.axis.client.Stub implements
         _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
         _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
         _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
-        _call.setOperationName(new javax.xml.namespace.QName("http://soap.v1.usage.fa.compass.calix.com", "getUse"));
+        _call.setOperationName(new javax.xml.namespace.QName("http://soap.v1.usage.fa.compass.calix.com", "ftpUse"));
 
         setRequestHeaders(_call);
         setAttachments(_call);
- try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {entityType, entityId, startTime, endTime, interval, dimension});
+ try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {entityType, entityId, startTime, endTime, interval, dimension, new java.lang.Boolean(mappingDetail), hostname, username, password, filename});
 
         if (_resp instanceof java.rmi.RemoteException) {
             throw (java.rmi.RemoteException)_resp;
         }
-        else {
-            extractAttachments(_call);
-            try {
-                return (com.calix.compass.fa.usage.v1.soap.data.IPDRX[]) _resp;
-            } catch (java.lang.Exception _exception) {
-                return (com.calix.compass.fa.usage.v1.soap.data.IPDRX[]) org.apache.axis.utils.JavaUtils.convert(_resp, com.calix.compass.fa.usage.v1.soap.data.IPDRX[].class);
-            }
+        extractAttachments(_call);
+  } catch (org.apache.axis.AxisFault axisFaultException) {
+  throw axisFaultException;
+}
+    }
+
+    public void ftpIPDR(java.lang.String endpoint, java.util.Calendar startTime, java.util.Calendar endTime, java.lang.String interval, java.lang.String hostname, java.lang.String username, java.lang.String password, java.lang.String filename) throws java.rmi.RemoteException {
+        if (super.cachedEndpoint == null) {
+            throw new org.apache.axis.NoEndPointException();
         }
+        org.apache.axis.client.Call _call = createCall();
+        _call.setOperation(_operations[1]);
+        _call.setUseSOAPAction(true);
+        _call.setSOAPActionURI("");
+        _call.setEncodingStyle(null);
+        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
+        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
+        _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
+        _call.setOperationName(new javax.xml.namespace.QName("http://soap.v1.usage.fa.compass.calix.com", "ftpIPDR"));
+
+        setRequestHeaders(_call);
+        setAttachments(_call);
+ try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {endpoint, startTime, endTime, interval, hostname, username, password, filename});
+
+        if (_resp instanceof java.rmi.RemoteException) {
+            throw (java.rmi.RemoteException)_resp;
+        }
+        extractAttachments(_call);
   } catch (org.apache.axis.AxisFault axisFaultException) {
   throw axisFaultException;
 }
@@ -261,7 +285,7 @@ public class UsageSoapBindingStub extends org.apache.axis.client.Stub implements
             throw new org.apache.axis.NoEndPointException();
         }
         org.apache.axis.client.Call _call = createCall();
-        _call.setOperation(_operations[1]);
+        _call.setOperation(_operations[2]);
         _call.setUseSOAPAction(true);
         _call.setSOAPActionURI("");
         _call.setEncodingStyle(null);
@@ -290,34 +314,7 @@ public class UsageSoapBindingStub extends org.apache.axis.client.Stub implements
 }
     }
 
-    public void ftpUse(java.lang.String entityType, java.lang.String entityId, Date startTime, Date endTime, java.lang.String interval, java.lang.String dimension, java.lang.String hostname, java.lang.String username, java.lang.String password, java.lang.String filename) throws java.rmi.RemoteException {
-        if (super.cachedEndpoint == null) {
-            throw new org.apache.axis.NoEndPointException();
-        }
-        org.apache.axis.client.Call _call = createCall();
-        _call.setOperation(_operations[2]);
-        _call.setUseSOAPAction(true);
-        _call.setSOAPActionURI("");
-        _call.setEncodingStyle(null);
-        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
-        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
-        _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
-        _call.setOperationName(new javax.xml.namespace.QName("http://soap.v1.usage.fa.compass.calix.com", "ftpUse"));
-
-        setRequestHeaders(_call);
-        setAttachments(_call);
- try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {entityType, entityId, startTime, endTime, interval, dimension, hostname, username, password, filename});
-
-        if (_resp instanceof java.rmi.RemoteException) {
-            throw (java.rmi.RemoteException)_resp;
-        }
-        extractAttachments(_call);
-  } catch (org.apache.axis.AxisFault axisFaultException) {
-  throw axisFaultException;
-}
-    }
-
-    public void ftpIPDR(java.lang.String endpoint, java.util.Calendar startTime, java.util.Calendar endTime, java.lang.String interval, java.lang.String hostname, java.lang.String username, java.lang.String password, java.lang.String filename) throws java.rmi.RemoteException {
+    public com.calix.compass.fa.usage.v1.soap.data.IPDRX[] getUse(java.lang.String entityType, java.lang.String entityId, java.util.Date startTime, java.util.Date endTime, java.lang.String interval, java.lang.String dimension, boolean mappingDetail) throws java.rmi.RemoteException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -329,16 +326,23 @@ public class UsageSoapBindingStub extends org.apache.axis.client.Stub implements
         _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
         _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
         _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
-        _call.setOperationName(new javax.xml.namespace.QName("http://soap.v1.usage.fa.compass.calix.com", "ftpIPDR"));
+        _call.setOperationName(new javax.xml.namespace.QName("http://soap.v1.usage.fa.compass.calix.com", "getUse"));
 
         setRequestHeaders(_call);
         setAttachments(_call);
- try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {endpoint, startTime, endTime, interval, hostname, username, password, filename});
+ try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {entityType, entityId, startTime, endTime, interval, dimension, new java.lang.Boolean(mappingDetail)});
 
         if (_resp instanceof java.rmi.RemoteException) {
             throw (java.rmi.RemoteException)_resp;
         }
-        extractAttachments(_call);
+        else {
+            extractAttachments(_call);
+            try {
+                return (com.calix.compass.fa.usage.v1.soap.data.IPDRX[]) _resp;
+            } catch (java.lang.Exception _exception) {
+                return (com.calix.compass.fa.usage.v1.soap.data.IPDRX[]) org.apache.axis.utils.JavaUtils.convert(_resp, com.calix.compass.fa.usage.v1.soap.data.IPDRX[].class);
+            }
+        }
   } catch (org.apache.axis.AxisFault axisFaultException) {
   throw axisFaultException;
 }

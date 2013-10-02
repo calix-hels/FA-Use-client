@@ -51,8 +51,8 @@ public class GetUse {
 
 	private static String target = "localhost";
 	private static String endpoint;
-	private static Calendar startCal;
-	private static Calendar endCal;
+	//private static Calendar startCal;
+	//private static Calendar endCal;
 	private static Date startTime;
 	private static Date endTime;
 	private static String interval;
@@ -64,6 +64,7 @@ public class GetUse {
 	private static String entityId;
 	private static String dimension;
 	private static String aggregate;
+	private static boolean mappingDetail = false;
 	private static boolean isAggr = false;
 
 	public static void main(String[] args) throws Exception {
@@ -100,7 +101,7 @@ public class GetUse {
 				System.out.println("Completed");
 			} else {
 				usage.ftpUse(entityType, entityId, startTime, endTime,
-						interval, dimension, ftpHost, ftpUser, ftpPass, ftpFile);
+						interval, dimension, mappingDetail, ftpHost, ftpUser, ftpPass, ftpFile);
 			}
 		} catch (Exception e) {
 			System.err.println("Failed to execute.  Reason: " + e);
@@ -111,8 +112,9 @@ public class GetUse {
 	private static void processMonthlyReport(Usage usage, List iPDRsList)
 			throws RemoteException {
 		IPDRX[] iPDRs = usage.getUse(entityType, entityId, startTime, endTime,
-				interval, dimension);
+				interval, dimension, mappingDetail);
 		addToList(iPDRsList, iPDRs);
+		Collections.sort(iPDRsList, new IpdrComparator());
 		if (isAggr) {
 			printAggregateResult(iPDRsList);
 		} else {
@@ -132,12 +134,13 @@ public class GetUse {
 						* ONE_HOUR_IN_MILLISECONDS);
 				Date tempEndTime = new Date(startTime.getTime());
 				iPDRs = usage.getUse(entityType, entityId, tempStartTime,
-						tempEndTime, interval, dimension);
+						tempEndTime, interval, dimension,mappingDetail);
 				addToList(iPDRsList, iPDRs);
 			} else {
 				iPDRs = usage.getUse(entityType, entityId, startTime, endTime,
-						interval, dimension);
+						interval, dimension,mappingDetail);
 				addToList(iPDRsList, iPDRs);
+				Collections.sort(iPDRsList, new IpdrComparator());
 				if (isAggr) {
 					printAggregateResult(iPDRsList);
 				} else {
@@ -154,7 +157,7 @@ public class GetUse {
 		if ("true".equalsIgnoreCase(System.getProperty("Debug_Raw_TimeSpan", "false"))) {
             //For test purpose: time span > 1hr.
 			iPDRs = usage.getUse(entityType, entityId, startTime, endTime,
-					interval, dimension);
+					interval, dimension,mappingDetail);
 			addToList(iPDRsList, iPDRs);
 			printResult(iPDRsList);
 		} else {
@@ -166,11 +169,11 @@ public class GetUse {
 							+ RAW_REQUEST_INTERVAL * ONE_HOUR_IN_MILLISECONDS);
 					Date tempEndTime = new Date(startTime.getTime());
 					iPDRs = usage.getUse(entityType, entityId, tempStartTime,
-							tempEndTime, interval, dimension);
+							tempEndTime, interval, dimension,mappingDetail);
 					addToList(iPDRsList, iPDRs);
 				} else {
 					iPDRs = usage.getUse(entityType, entityId, startTime,
-							endTime, interval, dimension);
+							endTime, interval, dimension,mappingDetail);
 					addToList(iPDRsList, iPDRs);
 					Collections.sort(iPDRsList, new IpdrComparator());
 					printResult(iPDRsList);
@@ -194,11 +197,11 @@ public class GetUse {
 				startTime
 						.setTime(startTime.getTime() + ONE_DAY_IN_MILLISECONDS);
 				iPDRs = usage.getUse(entityType, entityId, tempStartTime,
-						tempEndTime, interval, dimension);
+						tempEndTime, interval, dimension, mappingDetail);
 				addToList(iPDRsList, iPDRs);
 			} else {
 				iPDRs = usage.getUse(entityType, entityId, startTime, endTime,
-						interval, dimension);
+						interval, dimension,mappingDetail);
 				addToList(iPDRsList, iPDRs);
 				if (isAggr) {
 					printAggregateResult(iPDRsList);
@@ -226,14 +229,7 @@ public class GetUse {
 		// Process the response
 		if (null != iPDRs) {
 			if (!isHeaderPrinted) {
-				String header = "StartTime,"
-						+ entityType.toUpperCase()
-						+ ",Total Down,Total Up,Avg Rate Down,Avg Rate Up,Max Rate Down,Max Rate Up";
-				if (!StringUtils.isEmpty(dimension)) {
-					header += "," + dimension;
-				}
-				System.out.println(header);
-				isHeaderPrinted = true;
+				printHeader(isAggr);
 			}
 			for (int i = 0; i < iPDRs.length; i++) {
 				IPDRX ipdrx = (IPDRX) iPDRs[i];
@@ -251,6 +247,11 @@ public class GetUse {
 				if (!StringUtils.isEmpty(dimension)) {
 					result.append("," + ipdrx.getToDim());
 				}
+				
+				if (mappingDetail){
+					result.append("," + ipdrx.getMappingType());
+				}
+				
 				System.out.println(result);
 			}
 		}
@@ -261,15 +262,9 @@ public class GetUse {
 
 		if (iPDRs.size() > 0) {
 			if (!isHeaderPrinted) {
-				String header = "StartTime,"
-						+ entityType.toUpperCase()
-						+ ",Total Down,Total Up,Avg Rate Down,Avg Rate Up,Max Rate Down,Max Rate Up";
-				if (!StringUtils.isEmpty(dimension)) {
-					header += "," + dimension;
-				}
-				System.out.println(header);
-				isHeaderPrinted = true;
+				printHeader(isAggr);
 			}
+			
 			for (int i = 0; i < iPDRs.size(); i++) {
 				IPDRX ipdrx = (IPDRX) iPDRs.get(i);
 				StringBuffer result = new StringBuffer();
@@ -286,9 +281,35 @@ public class GetUse {
 				if (!StringUtils.isEmpty(dimension)) {
 					result.append("," + ipdrx.getToDim());
 				}
+				
+				if (mappingDetail){
+					result.append("," + ipdrx.getMappingType());
+				}
+				
 				System.out.println(result);
 			}
 		}
+	}
+
+	private static void printHeader(boolean isAggr) {
+	   String header = "";
+	   if (isAggr){
+		   header = entityType.toUpperCase()
+					+ ",Total Down,Total Up,Avg Rate Down,Avg Rate Up,Max Rate Down,Max Rate Up";
+	   }else{
+		   header = "StartTime,"
+					+ entityType.toUpperCase()
+					+ ",Total Down,Total Up,Avg Rate Down,Avg Rate Up,Max Rate Down,Max Rate Up"; 
+		   isHeaderPrinted = true;
+	   }
+	   
+	   if (!StringUtils.isEmpty(dimension)) {
+		   header += ",Dimension";
+	   }
+	   if (mappingDetail){
+		   header += ",MappingType";
+	   }
+	   System.out.println(header);
 	}
 
 	private static int subscriberCount(String subscriberId, List iPDRs) {
@@ -307,13 +328,8 @@ public class GetUse {
 		if (iPDRs == null) {
 			return;
 		}
+        printHeader(isAggr);
 
-		String header = entityType.toUpperCase()
-				+ ",Total Down,Total Up,Avg Rate Down,Avg Rate Up,Max Rate Down,Max Rate Up";
-		if (!StringUtils.isEmpty(dimension)) {
-			header += "," + dimension;
-		}
-		System.out.println(header);
 		/*
 		 * TODO: loop through the iPDRs array and aggregate the result based on
 		 * different subscribers.
@@ -328,7 +344,7 @@ public class GetUse {
 			subscriberData = new SubscriberData(ipdrx.getSubscriberID(), ipdrx
 					.getStartTime().getTime(), ipdrx.getInputOctets(),
 					ipdrx.getOutputOctets(), ipdrx.getMaxInputRate(),
-					ipdrx.getMaxOutputRate(), ipdrx.getToDim());
+					ipdrx.getMaxOutputRate(), ipdrx.getToDim(), ipdrx.getMappingType());
 			if (null == subscriberDataMap.get(ipdrx.getSubscriberID())) {
 				subscriberDataMap.put(ipdrx.getSubscriberID(), subscriberData);
 				subscriberDataCountMap.put(
@@ -375,6 +391,9 @@ public class GetUse {
 					.append(data.getMaxOutputRate());
 			if (!StringUtils.isEmpty(dimension)) {
 				result.append("," + data.getDimension());
+			}
+			if (mappingDetail){
+				result.append("," + data.getMappingType());
 			}
 			System.out.println(result);
 		}
@@ -484,6 +503,10 @@ public class GetUse {
 			if (line.hasOption("aggregate")) {
 				isAggr = true;
 			}
+			
+			if (line.hasOption("mappingdetail")) {
+				mappingDetail = true;
+			}
 
 		} catch (Exception exp) {
 			System.err.println("Failed to start.  Reason: " + exp.getMessage());
@@ -508,6 +531,7 @@ public class GetUse {
 				System.out.println("entityId: " + entityId);
 				System.out.println("dimension: " + dimension);
 				System.out.println("aggregate: " + aggregate);
+				System.out.println("mappingdetail: " + mappingDetail);
 			}
 		}
 	}
@@ -575,6 +599,11 @@ public class GetUse {
 				.withDescription(
 						"aggregate subscriber's hourly|daily|monthly data")
 				.withLongOpt("aggregate").create("aggr"));
+		options.addOption(OptionBuilder
+				.withArgName("mappingdetail")
+				.withDescription(
+						"show the mapping method of the endpoints")
+				.withLongOpt("mappingdetail").create("map"));
 		options.addOption(OptionBuilder.withDescription("display this message")
 				.withLongOpt("help").create("h"));
 		return options;

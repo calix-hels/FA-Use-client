@@ -51,8 +51,6 @@ public class GetUse {
 
 	private static String target = "localhost";
 	private static String endpoint;
-	//private static Calendar startCal;
-	//private static Calendar endCal;
 	private static Date startTime;
 	private static Date endTime;
 	private static String interval;
@@ -194,8 +192,6 @@ public class GetUse {
 				startTime.setTime(startTime.getTime() + DAILY_REQUEST_INTERVAL
 						* ONE_DAY_IN_MILLISECONDS);
 				Date tempEndTime = new Date(startTime.getTime());
-				startTime
-						.setTime(startTime.getTime() + ONE_DAY_IN_MILLISECONDS);
 				iPDRs = usage.getUse(entityType, entityId, tempStartTime,
 						tempEndTime, interval, dimension, mappingDetail);
 				addToList(iPDRsList, iPDRs);

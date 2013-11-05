@@ -2,29 +2,31 @@ This folder contains the reference implementation (in Java) and executable jar f
 
 # java -jar GetUse.jar --help
 usage: GetUse
- -aggr,--aggregate                aggregate subscriber's
-                                  hourly|daily|monthly data
- -d,--dimension <dimension>       dimension of the data
- -e,--endtime <time>              get information to this UTC time.
-                                  format: 2000-12-31 or "2000-12-31
-                                  12:00:00"
- -ei,--entityId <entityId>        entity id
- -et,--entityType <entityType>    entity type
- -f,--ftpfile <ftpfile>           ftp file name
- -fa,--target <target>            flow analyze host name
- -h,--help                        display this message
- -i,--interval <period>           must be 'daily'or 'hourly' or 'monthly'
-                                  or 'raw'
- -map,--mappingdetail             show the mapping method of the endpoints
- -n,--name <endpoint>             the name of the endpoint
- -p,--ftppassword <ftppassword>   ftp password
- -psw,--password <password>       the password of the soap service
- -s,--starttime <time>            get information from this UTC time.
-                                  format: 2000-12-31 or "2000-12-31
-                                  12:00:00"
- -t,--ftphost <ftphost>           host or IP of the ftp server
- -u,--ftpuser <ftpuser>           ftp username
- -uname,--username <username>     the username of the soap service
+ -aggr,--aggregate                       aggregate subscriber's
+                                         hourly|daily|monthly data
+ -d,--dimension <dimension>              dimension of the data
+ -e,--endtime <time>                     get information to this UTC time.
+                                         format: 2000-12-31 or "2000-12-31
+                                         12:00:00"
+ -ef,--entityListFile <entityListFile>   entity list file
+ -ei,--entityId <entityId>               entity id
+ -et,--entityType <entityType>           entity type
+ -f,--ftpfile <ftpfile>                  ftp file name
+ -fa,--target <target>                   flow analyze host name
+ -h,--help                               display this message
+ -i,--interval <period>                  must be 'daily'or 'hourly' or
+                                         'monthly' or 'raw'
+ -map,--mappingdetail                    show the mapping method of the
+                                         endpoints
+ -n,--name <endpoint>                    the name of the endpoint
+ -p,--ftppassword <ftppassword>          ftp password
+ -psw,--password <password>              the password of the soap service
+ -s,--starttime <time>                   get information from this UTC
+                                         time. format: 2000-12-31 or
+                                         "2000-12-31 12:00:00"
+ -t,--ftphost <ftphost>                  host or IP of the ftp server
+ -u,--ftpuser <ftpuser>                  ftp username
+ -uname,--username <username>            the username of the soap service
 
    
    

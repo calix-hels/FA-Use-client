@@ -1,5 +1,9 @@
 package com.calix.compass.fa.usage.v1.soap;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.URL;
 import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
@@ -60,10 +64,15 @@ public class GetUse {
 	private static String ftpFile;
 	private static String entityType;
 	private static String entityId;
+	private static List entityIdList = new ArrayList();
+	private static List unknownEntityList = new ArrayList();
+	private static String entityListFile;
 	private static String dimension;
 	private static String aggregate;
 	private static boolean mappingDetail = false;
 	private static boolean isAggr = false;
+	private static IpdrComparator ipdrComparator = new IpdrComparator();
+	
 
 	public static void main(String[] args) throws Exception {
 		/**
@@ -109,20 +118,40 @@ public class GetUse {
 
 	private static void processMonthlyReport(Usage usage, List iPDRsList)
 			throws RemoteException {
-		IPDRX[] iPDRs = usage.getUse(entityType, entityId, startTime, endTime,
-				interval, dimension, mappingDetail);
-		addToList(iPDRsList, iPDRs);
-		Collections.sort(iPDRsList, new IpdrComparator());
+		//TODO: get an array of entityId.
+		
+		if(entityIdList.size() > 0){
+			Iterator it = entityIdList.iterator();
+			while(it.hasNext()){
+				String entityName = (String)it.next();
+				try {
+					getUsageIntoList(usage, iPDRsList, startTime, endTime, entityName);
+				} catch (RemoteException e) {
+					if (!unknownEntityList.contains(entityName)){
+						System.err.println("Remote exception: endpoint \"" + entityName+ "\" does not exist.");
+						unknownEntityList.add(entityName);
+					}
+				}
+			}
+		}else{
+			try {
+				getUsageIntoList(usage, iPDRsList, startTime, endTime, entityId);
+			} catch (RemoteException e) {
+				System.err.println("Remote exception: endpoint \"" + entityId+ "\" does not exist.");
+			}
+		}
+		
+		Collections.sort(iPDRsList, ipdrComparator);
 		if (isAggr) {
 			printAggregateResult(iPDRsList);
 		} else {
-			printResult(iPDRs);
+			printResult(iPDRsList);
 		}
 	}
 
 	private static void processHourlyReport(Usage usage, List iPDRsList)
 			throws RemoteException {
-		IPDRX[] iPDRs = null;
+		
 		while (endTime != null && startTime.compareTo(endTime) <= 0) {
 			long hourOffset = (endTime.getTime() - startTime.getTime())
 					/ ONE_HOUR_IN_MILLISECONDS;
@@ -131,14 +160,49 @@ public class GetUse {
 				startTime.setTime(startTime.getTime() + HOURLY_REQUEST_INTERVAL
 						* ONE_HOUR_IN_MILLISECONDS);
 				Date tempEndTime = new Date(startTime.getTime());
-				iPDRs = usage.getUse(entityType, entityId, tempStartTime,
-						tempEndTime, interval, dimension,mappingDetail);
-				addToList(iPDRsList, iPDRs);
+				if (entityIdList.size() > 0){
+					Iterator it = entityIdList.iterator();
+					while(it.hasNext()){
+						String entityName = (String)it.next();
+						try {
+							getUsageIntoList(usage, iPDRsList, tempStartTime,tempEndTime, entityName);
+						} catch (RemoteException e) {
+							if (!unknownEntityList.contains(entityName)){
+								System.err.println("Remote exception: endpoint \"" + entityName+ "\" does not exist.");
+								unknownEntityList.add(entityName);
+							}
+						}
+					}
+				}else{
+					try {
+						getUsageIntoList(usage, iPDRsList, tempStartTime, tempEndTime, entityId);
+					} catch (RemoteException e) {
+						System.err.println("Remote exception: endpoint \"" + entityId+ "\" does not exist.");
+					}
+				}
+				
 			} else {
-				iPDRs = usage.getUse(entityType, entityId, startTime, endTime,
-						interval, dimension,mappingDetail);
-				addToList(iPDRsList, iPDRs);
-				Collections.sort(iPDRsList, new IpdrComparator());
+				if (entityIdList.size() > 0){
+					Iterator it = entityIdList.iterator();
+					while(it.hasNext()){
+						String entityName = (String)it.next();
+						try {
+							getUsageIntoList(usage, iPDRsList, startTime, endTime, entityName);
+						} catch (RemoteException e) {
+							if (!unknownEntityList.contains(entityName)){
+								System.err.println("Remote exception: endpoint \"" + entityName+ "\" does not exist.");
+								unknownEntityList.add(entityName);
+							}
+						}
+					}
+				}else{
+					try {
+						getUsageIntoList(usage, iPDRsList, startTime, endTime, entityId);
+					} catch (RemoteException e) {
+						System.err.println("Remote exception: endpoint \"" + entityId+ "\" does not exist.");
+					}
+				}
+				Collections.sort(iPDRsList, ipdrComparator);
 				if (isAggr) {
 					printAggregateResult(iPDRsList);
 				} else {
@@ -166,14 +230,49 @@ public class GetUse {
 					startTime.setTime(startTime.getTime()
 							+ RAW_REQUEST_INTERVAL * ONE_HOUR_IN_MILLISECONDS);
 					Date tempEndTime = new Date(startTime.getTime());
-					iPDRs = usage.getUse(entityType, entityId, tempStartTime,
-							tempEndTime, interval, dimension,mappingDetail);
-					addToList(iPDRsList, iPDRs);
+					
+					if (entityIdList.size() > 0){
+						Iterator it = entityIdList.iterator();
+						while(it.hasNext()){
+							String entityName = (String)it.next();
+							try {
+								getUsageIntoList(usage, iPDRsList, tempStartTime, tempEndTime, entityName);
+							} catch (RemoteException e) {
+								if (!unknownEntityList.contains(entityName)){
+									System.err.println("Remote exception: endpoint \"" + entityName+ "\" does not exist.");
+									unknownEntityList.add(entityName);
+								}
+							}
+						}
+					}else{
+						try {
+							getUsageIntoList(usage, iPDRsList, tempStartTime, tempEndTime, entityId);
+						} catch (RemoteException e) {
+							System.err.println("Remote exception: endpoint \"" + entityId+ "\" does not exist.");
+						}
+					}
 				} else {
-					iPDRs = usage.getUse(entityType, entityId, startTime,
-							endTime, interval, dimension,mappingDetail);
-					addToList(iPDRsList, iPDRs);
-					Collections.sort(iPDRsList, new IpdrComparator());
+					if (entityIdList.size() > 0){
+						Iterator it = entityIdList.iterator();
+						while(it.hasNext()){
+							String entityName = (String)it.next();
+							try {
+								getUsageIntoList(usage, iPDRsList, startTime, endTime, entityName);
+							} catch (RemoteException e) {
+								if (!unknownEntityList.contains(entityName)){
+									System.err.println("Remote exception: endpoint \"" + entityName+ "\" does not exist.");
+									unknownEntityList.add(entityName);
+								}
+							}
+						}
+					}else{
+						try {
+							getUsageIntoList(usage, iPDRsList, startTime, endTime, entityId);
+						} catch (RemoteException e) {
+							System.err.println("Remote exception: endpoint \"" + entityId+ "\" does not exist.");
+						}
+					}
+					Collections.sort(iPDRsList, ipdrComparator);
 					printResult(iPDRsList);
 					break;
 				}
@@ -184,32 +283,81 @@ public class GetUse {
 
 	private static void processDailyReport(Usage usage, List iPDRsList)
 			throws RemoteException {
-		IPDRX[] iPDRs = null;
-		while (endTime != null && startTime.compareTo(endTime) <= 0) {
-			// 2-day chunk as we did in R2.0.
-			if (timeInterval(startTime, endTime) > DAILY_REQUEST_INTERVAL) {
-				Date tempStartTime = new Date(startTime.getTime());
-				startTime.setTime(startTime.getTime() + DAILY_REQUEST_INTERVAL
-						* ONE_DAY_IN_MILLISECONDS);
-				Date tempEndTime = new Date(startTime.getTime());
-				iPDRs = usage.getUse(entityType, entityId, tempStartTime,
-						tempEndTime, interval, dimension, mappingDetail);
-				addToList(iPDRsList, iPDRs);
-			} else {
-				iPDRs = usage.getUse(entityType, entityId, startTime, endTime,
-						interval, dimension,mappingDetail);
-				addToList(iPDRsList, iPDRs);
-				if (isAggr) {
-					printAggregateResult(iPDRsList);
+		
+			while (endTime != null && startTime.compareTo(endTime) <= 0) {
+				// 2-day chunk as we did in R2.0.
+				if (timeInterval(startTime, endTime) > DAILY_REQUEST_INTERVAL) {
+					Date tempStartTime = new Date(startTime.getTime());
+					startTime.setTime(startTime.getTime() + DAILY_REQUEST_INTERVAL
+							* ONE_DAY_IN_MILLISECONDS);
+					Date tempEndTime = new Date(startTime.getTime());
+					if (entityIdList.size() > 0){
+						Iterator it = entityIdList.iterator();
+						while(it.hasNext()){
+						    String entityName = (String)it.next();
+						    try {
+								getUsageIntoList(usage, iPDRsList, tempStartTime,
+										tempEndTime, entityName);
+							} catch (RemoteException e) {
+								if (!unknownEntityList.contains(entityName)){
+									System.err.println("Remote exception: endpoint \"" + entityName+ "\" does not exist.");
+									unknownEntityList.add(entityName);
+								}
+							}
+						}
+					}else{
+						try {
+							getUsageIntoList(usage, iPDRsList, tempStartTime, tempEndTime, entityId);
+						} catch (RemoteException e) {
+							System.err.println("Remote exception: endpoint \"" + entityId+ "\" does not exist.");
+						}
+					}
+					
 				} else {
-					Collections.sort(iPDRsList, new IpdrComparator());
-					printResult(iPDRsList);
+					if (entityIdList.size() > 0){
+						Iterator it = entityIdList.iterator();
+						while(it.hasNext()){
+							String entityName = (String)it.next();
+							try {
+								getUsageIntoList(usage, iPDRsList, startTime, endTime, entityName);
+							} catch (RemoteException e) {
+								if (!unknownEntityList.contains(entityName)){
+									System.err.println("Remote exception: endpoint \"" + entityName+ "\" does not exist.");
+									unknownEntityList.add(entityName);
+								}
+							}
+						}
+					}else{
+						try {
+							getUsageIntoList(usage, iPDRsList, startTime, endTime, entityId);
+						} catch (RemoteException e) {
+							System.err.println("Remote exception: endpoint \"" + entityId+ "\" does not exist.");
+						}
+					}
+					
+					if (isAggr) {
+						printAggregateResult(iPDRsList);
+					} else {
+						Collections.sort(iPDRsList, ipdrComparator);
+						printResult(iPDRsList);
+					}
+					break;
 				}
-				break;
 			}
-		}
+		
+
 	}
 
+	
+	private static void getUsageIntoList(Usage usage, List iPDRsList,
+			Date startTime, Date endTime, String entityName)
+			throws RemoteException {
+		IPDRX[] iPDRs;
+		iPDRs = usage.getUse(entityType, entityName, startTime, endTime, interval, dimension, mappingDetail);
+		addToList(iPDRsList, iPDRs);
+	}
+	
+	
 	private static void addToList(List iPDRsList, IPDRX[] iPDRs) {
 		if (null != iPDRs) {
 			Collections.addAll(iPDRsList, iPDRs);
@@ -491,6 +639,57 @@ public class GetUse {
 			if (line.hasOption("entityId")) {
 				entityId = line.getOptionValue("entityId");
 			}
+			
+			if (line.hasOption("entityListFile")) {
+				if (line.hasOption("entityId")){
+					throw new Exception("entityListFile(-ef) cannot be used when entityId is specified.");
+				}else{
+					//TODO: Parse the file to extract a list of endpoint names and then insert into entityIdList.
+					/*Format of the file:
+						#Format of the endpoint file: list ONE endpoint on each line.
+						xyz
+						abc
+						#comments         <- Comments line, should be skipped.
+						                  <- Blank line, should be skipped.
+						#damonx           <- We could comment out one or more lines.
+						endpoint123 endpoint456      <- Invalid line which violates the format will be skipped. 
+					 * */
+					entityListFile = line.getOptionValue("entityListFile");
+					String entityListFileFullName = "." + File.separatorChar + entityListFile;
+					BufferedReader br = null;
+					try {
+						String sCurrentLine;
+						br = new BufferedReader(new FileReader(entityListFileFullName));
+						while ((sCurrentLine = br.readLine()) != null) {
+						    if (sCurrentLine.trim().length() != 0 && !sCurrentLine.startsWith("#")){
+						    	String endpoint = sCurrentLine.trim();
+						    	if (!entityIdList.contains(endpoint)){
+						    		entityIdList.add(endpoint);
+						    	}
+						    }else{
+						    	System.err.println("Skipped an invalid or comment line");
+						    }
+						}
+						if (entityIdList.size()==0){
+							System.err.println("No specified endpoints");
+							System.exit(1);
+						}
+					} catch (IOException e) {
+						System.err.println("Failed to open the entity list file.");
+						System.exit(1);
+					} finally {
+						try {
+							if (br != null)
+								br.close();
+						} catch (IOException ex) {
+							ex.printStackTrace();
+						}
+					}
+				}
+
+				
+				
+			}
 
 			if (line.hasOption("dimension")) {
 				dimension = line.getOptionValue("dimension");
@@ -525,6 +724,7 @@ public class GetUse {
 				System.out.println("ftpFile: " + ftpFile);
 				System.out.println("entityType: " + entityType);
 				System.out.println("entityId: " + entityId);
+				System.out.println("entityListFile: " + entityListFile);
 				System.out.println("dimension: " + dimension);
 				System.out.println("aggregate: " + aggregate);
 				System.out.println("mappingdetail: " + mappingDetail);
@@ -587,6 +787,9 @@ public class GetUse {
 		options.addOption(OptionBuilder.withArgName("entityId").hasArg()
 				.withDescription("entity id").withLongOpt("entityId")
 				.create("ei"));
+		options.addOption(OptionBuilder.withArgName("entityListFile").hasArg()
+				.withDescription("entity list file").withLongOpt("entityListFile")
+				.create("ef"));
 		options.addOption(OptionBuilder.withArgName("dimension").hasArg()
 				.withDescription("dimension of the data")
 				.withLongOpt("dimension").create("d"));

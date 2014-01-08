@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
 import java.rmi.RemoteException;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -34,6 +35,7 @@ public class GetUse {
 			"yyyy-MM-dd");
 	private static final SimpleDateFormat dateTimeFormatGmt = new SimpleDateFormat(
 			"yyyy-MM-dd HH:mm:ss");
+	private static final DecimalFormat decimalFormat = new DecimalFormat("##.00");
 	static SimpleDateFormat csvFriendlyDateFormatGmt = new SimpleDateFormat(
 			"MM/dd/yyyy HH:mm:ss");
 	static SimpleDateFormat simpleDateFosormat = new SimpleDateFormat(
@@ -382,12 +384,12 @@ public class GetUse {
 						csvFriendlyDateFormatGmt.format(ipdrx.getStartTime()
 								.getTime()) + ",")
 						.append(ipdrx.getSubscriberID() + ",")
-						.append(ipdrx.getInputOctets() + ",")
-						.append(ipdrx.getOutputOctets() + ",")
-						.append(ipdrx.getAvgInputRate() + ",")
-						.append(ipdrx.getAvgOutputRate() + ",")
-						.append(ipdrx.getMaxInputRate() + ",")
-						.append(ipdrx.getMaxOutputRate());
+						.append(decimalFormat.format(ipdrx.getInputOctets()) + ",")
+						.append(decimalFormat.format(ipdrx.getOutputOctets()) + ",")
+						.append(decimalFormat.format(ipdrx.getAvgInputRate()) + ",")
+						.append(decimalFormat.format(ipdrx.getAvgOutputRate()) + ",")
+						.append(decimalFormat.format(ipdrx.getMaxInputRate()) + ",")
+						.append(decimalFormat.format(ipdrx.getMaxOutputRate()));
 				if (!StringUtils.isEmpty(dimension)) {
 					result.append("," + ipdrx.getToDim());
 				}
@@ -416,12 +418,12 @@ public class GetUse {
 						csvFriendlyDateFormatGmt.format(ipdrx.getStartTime()
 								.getTime()) + ",")
 						.append(ipdrx.getSubscriberID() + ",")
-						.append(ipdrx.getInputOctets() + ",")
-						.append(ipdrx.getOutputOctets() + ",")
-						.append(ipdrx.getAvgInputRate() + ",")
-						.append(ipdrx.getAvgOutputRate() + ",")
-						.append(ipdrx.getMaxInputRate() + ",")
-						.append(ipdrx.getMaxOutputRate());
+						.append(decimalFormat.format(ipdrx.getInputOctets()) + ",")
+						.append(decimalFormat.format(ipdrx.getOutputOctets()) + ",")
+						.append(decimalFormat.format(ipdrx.getAvgInputRate()) + ",")
+						.append(decimalFormat.format(ipdrx.getAvgOutputRate()) + ",")
+						.append(decimalFormat.format(ipdrx.getMaxInputRate()) + ",")
+						.append(decimalFormat.format(ipdrx.getMaxOutputRate()));
 				if (!StringUtils.isEmpty(dimension)) {
 					result.append("," + ipdrx.getToDim());
 				}
@@ -522,17 +524,16 @@ public class GetUse {
 			SubscriberData data = (SubscriberData) entry.getValue();
 			StringBuffer result = new StringBuffer();
 			result.append(data.getSubscriberId() + ",")
-					.append(data.getInputOctets() + ",")
-					.append(data.getOutputOctets() + ",");
+					.append(decimalFormat.format(data.getInputOctets()) + ",")
+					.append(decimalFormat.format(data.getOutputOctets()) + ",");
 			Integer subscriberDataCount = (Integer) subscriberDataCountMap
 					.get(data.getSubscriberId());
-			double avgInputRate = data.getInputOctets()
-					/ subscriberDataCount.intValue();
+			double avgInputRate = data.getInputOctets() / subscriberDataCount.intValue();
 			double avgOutputRate = data.getOutputOctets()
 					/ subscriberDataCount.intValue();
-			result.append(avgInputRate + ",").append(avgOutputRate + ",")
-					.append(data.getMaxInputRate() + ",")
-					.append(data.getMaxOutputRate());
+			result.append(decimalFormat.format(avgInputRate) + ",").append(decimalFormat.format(avgOutputRate) + ",")
+					.append(decimalFormat.format(data.getMaxInputRate()) + ",")
+					.append(decimalFormat.format(data.getMaxOutputRate()));
 			if (!StringUtils.isEmpty(dimension)) {
 				result.append("," + data.getDimension());
 			}

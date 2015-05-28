@@ -73,6 +73,7 @@ public class GetUse {
 	private static String aggregate;
 	private static boolean mappingDetail = false;
 	private static boolean isAggr = false;
+	private static String delimiter = ",";
 	private static IpdrComparator ipdrComparator = new IpdrComparator();
 	
 
@@ -382,20 +383,20 @@ public class GetUse {
 				StringBuffer result = new StringBuffer();
 				result.append(
 						csvFriendlyDateFormatGmt.format(ipdrx.getStartTime()
-								.getTime()) + ",")
-						.append(ipdrx.getSubscriberID() + ",")
-						.append(decimalFormat.format(ipdrx.getInputOctets()) + ",")
-						.append(decimalFormat.format(ipdrx.getOutputOctets()) + ",")
-						.append(decimalFormat.format(ipdrx.getAvgInputRate()) + ",")
-						.append(decimalFormat.format(ipdrx.getAvgOutputRate()) + ",")
-						.append(decimalFormat.format(ipdrx.getMaxInputRate()) + ",")
+								.getTime()) + delimiter)
+						.append(ipdrx.getSubscriberID() + delimiter)
+						.append(decimalFormat.format(ipdrx.getInputOctets()) + delimiter)
+						.append(decimalFormat.format(ipdrx.getOutputOctets()) + delimiter)
+						.append(decimalFormat.format(ipdrx.getAvgInputRate()) + delimiter)
+						.append(decimalFormat.format(ipdrx.getAvgOutputRate()) + delimiter)
+						.append(decimalFormat.format(ipdrx.getMaxInputRate()) + delimiter)
 						.append(decimalFormat.format(ipdrx.getMaxOutputRate()));
 				if (!StringUtils.isEmpty(dimension)) {
-					result.append("," + ipdrx.getToDim());
+					result.append(delimiter + ipdrx.getToDim());
 				}
 				
 				if (mappingDetail){
-					result.append("," + ipdrx.getMappingType());
+					result.append(delimiter + ipdrx.getMappingType());
 				}
 				
 				System.out.println(result);
@@ -416,20 +417,20 @@ public class GetUse {
 				StringBuffer result = new StringBuffer();
 				result.append(
 						csvFriendlyDateFormatGmt.format(ipdrx.getStartTime()
-								.getTime()) + ",")
-						.append(ipdrx.getSubscriberID() + ",")
-						.append(decimalFormat.format(ipdrx.getInputOctets()) + ",")
-						.append(decimalFormat.format(ipdrx.getOutputOctets()) + ",")
-						.append(decimalFormat.format(ipdrx.getAvgInputRate()) + ",")
-						.append(decimalFormat.format(ipdrx.getAvgOutputRate()) + ",")
-						.append(decimalFormat.format(ipdrx.getMaxInputRate()) + ",")
+								.getTime()) + delimiter)
+						.append(ipdrx.getSubscriberID() + delimiter)
+						.append(decimalFormat.format(ipdrx.getInputOctets()) + delimiter)
+						.append(decimalFormat.format(ipdrx.getOutputOctets()) + delimiter)
+						.append(decimalFormat.format(ipdrx.getAvgInputRate()) + delimiter)
+						.append(decimalFormat.format(ipdrx.getAvgOutputRate()) + delimiter)
+						.append(decimalFormat.format(ipdrx.getMaxInputRate()) + delimiter)
 						.append(decimalFormat.format(ipdrx.getMaxOutputRate()));
 				if (!StringUtils.isEmpty(dimension)) {
-					result.append("," + ipdrx.getToDim());
+					result.append(delimiter + ipdrx.getToDim());
 				}
 				
 				if (mappingDetail){
-					result.append("," + ipdrx.getMappingType());
+					result.append(delimiter + ipdrx.getMappingType());
 				}
 				
 				System.out.println(result);
@@ -455,6 +456,7 @@ public class GetUse {
 	   if (mappingDetail){
 		   header += ",MappingType";
 	   }
+	   header = header.replace(",", delimiter);
 	   System.out.println(header);
 	}
 
@@ -523,22 +525,22 @@ public class GetUse {
 			Map.Entry entry = (Map.Entry) iter.next();
 			SubscriberData data = (SubscriberData) entry.getValue();
 			StringBuffer result = new StringBuffer();
-			result.append(data.getSubscriberId() + ",")
-					.append(decimalFormat.format(data.getInputOctets()) + ",")
-					.append(decimalFormat.format(data.getOutputOctets()) + ",");
+			result.append(data.getSubscriberId() + delimiter)
+					.append(decimalFormat.format(data.getInputOctets()) + delimiter)
+					.append(decimalFormat.format(data.getOutputOctets()) + delimiter);
 			Integer subscriberDataCount = (Integer) subscriberDataCountMap
 					.get(data.getSubscriberId());
 			double avgInputRate = data.getInputOctets() / subscriberDataCount.intValue();
 			double avgOutputRate = data.getOutputOctets()
 					/ subscriberDataCount.intValue();
-			result.append(decimalFormat.format(avgInputRate) + ",").append(decimalFormat.format(avgOutputRate) + ",")
-					.append(decimalFormat.format(data.getMaxInputRate()) + ",")
+			result.append(decimalFormat.format(avgInputRate) + delimiter).append(decimalFormat.format(avgOutputRate) + delimiter)
+					.append(decimalFormat.format(data.getMaxInputRate()) + delimiter)
 					.append(decimalFormat.format(data.getMaxOutputRate()));
 			if (!StringUtils.isEmpty(dimension)) {
-				result.append("," + data.getDimension());
+				result.append(delimiter + data.getDimension());
 			}
 			if (mappingDetail){
-				result.append("," + data.getMappingType());
+				result.append(delimiter + data.getMappingType());
 			}
 			System.out.println(result);
 		}
@@ -703,6 +705,9 @@ public class GetUse {
 			if (line.hasOption("mappingdetail")) {
 				mappingDetail = true;
 			}
+			if (line.hasOption("delimiter")) {
+				delimiter = line.getOptionValue("delimiter");
+			}
 
 		} catch (Exception exp) {
 			System.err.println("Failed to start.  Reason: " + exp.getMessage());
@@ -729,6 +734,7 @@ public class GetUse {
 				System.out.println("dimension: " + dimension);
 				System.out.println("aggregate: " + aggregate);
 				System.out.println("mappingdetail: " + mappingDetail);
+				System.out.println("delimiter: " + delimiter);
 			}
 		}
 	}
@@ -804,6 +810,11 @@ public class GetUse {
 				.withDescription(
 						"show the mapping method of the endpoints")
 				.withLongOpt("mappingdetail").create("map"));
+		options.addOption(OptionBuilder
+				.withArgName("delimiter").hasArg()
+				.withDescription(
+						"optional delimiter string. not applicable for FTP operations. use comma by default")
+				.withLongOpt("delimiter").create("de"));
 		options.addOption(OptionBuilder.withDescription("display this message")
 				.withLongOpt("help").create("h"));
 		return options;

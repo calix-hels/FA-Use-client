@@ -43,3 +43,8 @@ usage: GetUse
        ... -et endpoint -s 2012-06-01 -e 2012-06-02 -i daily -d application 
    #4) The same as #1, but aggregate the result with regard to subscribers
        ... -et endpoint -s 2012-06-01 -e 2012-06-02 -i daily -d application -aggr
+   #5) The same as #1, but specifies a delimiter in output
+       ... -et endpoint -s 2012-06-01 -e 2012-06-02 -i daily -de "%%%"
+   
+   Note
+   This build is tested under jdk1.7. If you need build on jdk previous version, you can download the code, and use "make" to generate the build. If any question, contact us.

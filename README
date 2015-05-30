@@ -5,6 +5,9 @@ usage: GetUse
  -aggr,--aggregate                       aggregate subscriber's
                                          hourly|daily|monthly data
  -d,--dimension <dimension>              dimension of the data
+ -de,--delimiter <delimiter>             optional delimiter string. not
+                                         applicable for FTP operations.
+                                         use comma by default
  -e,--endtime <time>                     get information to this UTC time.
                                          format: 2000-12-31 or "2000-12-31
                                          12:00:00"

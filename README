@@ -1,42 +1,72 @@
 This folder contains the reference implementation (in Java) and executable jar file (GetUse.jar) that is used to extract usage information from the Flow Analyze using the 'Usage Based Billing' SOAP API.  API documentation is available in the accompanying document, Calix Database API and Schema.pdf.  GetUse.jar documentation is available below.  GetUse.jar is executed from the command line, with a description of its input parameters below.  It returns information to the standard out stream in CSV format.  If the user provides FTP information, then the CSV file will be pushed to that location.
 
 # java -jar GetUse.jar --help
-usage: GetUse
+usage: GetUse client realease R1.0
+              Notes:
+              1. unit used in result
+              Total Down                byte
+              Total Up                  byte
+              Avg Rate Down             bit per second
+              Avg Rate Up               bit per second
+              Max Rate Down             bit per second
+              Max Rate Up               bit per second
+              2. time interval
+              The time interval specified by start/end time is left-closed
+              and right-open. E.g. start time <= the time interval < end
+              time
+              -----------------------------------
  -aggr,--aggregate                       aggregate subscriber's
-                                         hourly|daily|monthly data
- -d,--dimension <dimension>              dimension of the data
- -e,--endtime <time>                     get information to this UTC time.
-                                         format: 2000-12-31 or "2000-12-31
-                                         12:00:00"
+                                         hourly/daily/monthly data and
+                                         returns the average rate/usage in
+                                         the result
+ -d,--dimension <dimension>              second dimension of the query,
+                                         today only 'application' is
+                                         supported. and when this
+                                         parameter is specified, parameter
+                                         '-et' can only be 'endpoint' or
+                                         'location'
+ -e,--endtime <time>                     mandatory
+                                         end time, must be UTC time.
+                                         Format: '2000-12-31' or
+                                         '2000-12-31 12:00:00'
  -ef,--entityListFile <entityListFile>   entity list file
- -ei,--entityId <entityId>               entity id
- -et,--entityType <entityType>           entity type
+ -ei,--entityId <entityId>               entity id. If -et is "location",
+                                         this parameter supports wildcard.
+                                         Rule:
+                                         *: 0-N characters
+                                         ?: single character
+                                         a|b: a or b
+ -et,--entityType <entityType>           mandatory
+                                         entity type, must be 'endpoint'
+                                         or 'application' or 'location' or
+                                         'interface'
  -f,--ftpfile <ftpfile>                  ftp file name
  -fa,--target <target>                   flow analyze host name
  -h,--help                               display this message
- -i,--interval <period>                  must be 'daily'or 'hourly' or
-                                         'monthly' or 'raw'
- -map,--mappingdetail                    show the mapping method of the
-                                         endpoints
- -n,--name <endpoint>                    the name of the endpoint
+ -i,--interval <interval>                mandatory
+                                         interval of the query, must be
+                                         'daily'/'hourly'/'monthly'
  -p,--ftppassword <ftppassword>          ftp password
- -psw,--password <password>              the password of the soap service
- -s,--starttime <time>                   get information from this UTC
-                                         time. format: 2000-12-31 or
-                                         "2000-12-31 12:00:00"
+ -psw,--password <password>              mandatory
+                                         Command Center password
+ -s,--starttime <time>                   mandatory
+                                         start time, must be UTC time.
+                                         Format: '2000-12-31' or
+                                         '2000-12-31 12:00:00'
  -t,--ftphost <ftphost>                  host or IP of the ftp server
  -u,--ftpuser <ftpuser>                  ftp username
- -uname,--username <username>            the username of the soap service
-
-   
-   
-   Examples
-   All request start with $ java -jar GetUse.jar -fa <fa_host_name> -uname <user> -psw <password> 
-   #1) Basic request, getting all endpoints for June 1-2 for the day
-       ... -et endpoint -s 2012-06-01 -e 2012-06-02 -i daily
-   #2) The same #1, but only retrieve usage information for 'endpoint1'
-       ... -et endpoint -s 2012-6-1 -e 2012-6-2 -i daily -ei endpoint1
-   #3) The same as #1, but break down the result by application
-       ... -et endpoint -s 2012-06-01 -e 2012-06-02 -i daily -d application 
-   #4) The same as #1, but aggregate the result with regard to subscribers
-       ... -et endpoint -s 2012-06-01 -e 2012-06-02 -i daily -d application -aggr
+ -uname,--username <username>            mandatory
+                                         Command Center username
+Examples:
+1. java -jar GetUse.jar -uname <username> -psw <password> -fa <ip> -et
+location -s "2014-04-01 00:00:00" -e "2014-05-01 00:00:00" -i monthly
+Explanation: query monthly usage of all locations in April, 2014
+2. java -jar GetUse.jar -uname <username> -psw <password> -fa <ip> -et
+application -ei "Skype" -s "2014-05-01 00:00:00" -e "2014-05-02 00:00:00"
+-i daily
+Explanation: query daily usage of application "Skype" in May 1st, 2014
+3. java -jar GetUse.jar -uname <username> -psw <password> -fa <ip> -et
+location -ei "*ADSL*|BDSL*" -s "2014-04-01 00:00:00" -e "2014-05-01
+00:00:00" -i monthly -d application
+Explanation: query monthly usage of all applications used in location
+"*ADSL*" or "BDSL*" in April, 2014

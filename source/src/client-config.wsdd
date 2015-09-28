@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deployment name="defaultClientConfig" xmlns="http://xml.apache.org/axis/wsdd/"
+	xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
+	<globalConfiguration>
+		<requestFlow>
+		    <handler name="AuthenticationHandler" type="java:com.calix.compass.fa.usage.v1.soap.AuthenticationHandler" >
+		        <parameter name="username" value="" />
+		        <parameter name="password" value="" />
+		    </handler>
+			<handler name="TimeOutHandler"
+				type="java:com.calix.compass.fa.usage.v1.soap.TimeOutHandler">
+				<!-- Added a 2 hour time out. 120 * 60000(1min) -->
+				<parameter name="timeout" value="7200000" />
+			</handler>
+		</requestFlow>
+		<parameter name="disablePrettyXML" value="true" />
+		<parameter name="enableNamespacePrefixOptimization" value="false" />
+	</globalConfiguration>
+	<transport name="http"
+		pivot="java:org.apache.axis.transport.http.HTTPSender" />
+	<transport name="local"
+		pivot="java:org.apache.axis.transport.local.LocalSender" />
+	<transport name="java"
+		pivot="java:org.apache.axis.transport.java.JavaSender" />
+</deployment>  
